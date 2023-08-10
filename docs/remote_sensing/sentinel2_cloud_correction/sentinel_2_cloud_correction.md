@@ -55,6 +55,8 @@ First, we must import some modules. The non-native package versions used are:
   - geopandas==0.13.0
   - numpy==1.24.3
   - tqdm==4.65.0
+  
+You must also have GDAL installed, the version used for this tutorial is 3.6.4
 
 ``` {python}
 import os 
@@ -68,7 +70,8 @@ import numpy as np
 from tqdm import tqdm
 ```
 
-Next, we define some contsants and helper functions for loading in data and cleaning it:  
+Next, we define some constants and helper functions for loading in data and
+cleaning it:  
 
 ``` {python}
 MAX_BAND_VAL = 4000  # counts
@@ -238,7 +241,7 @@ def create_cloud_cleaned_composite(in_dir: str, mgrs_tile: str, band: str, out_f
                     indexes=1
                 )
 
-    shutil.rmtree(os.path.dirname(slice_dir))
+    shutil.rmtree(slice_dir)
     print(f'Wrote file to {out_file}')
 
 ```
