@@ -61,6 +61,7 @@ You must also have GDAL installed, the version used for this tutorial is 3.6.4
 ``` {python}
 import os 
 import warnings
+import shutil
 
 import rasterio
 from rasterio import features
@@ -181,7 +182,7 @@ def create_cloud_cleaned_composite(in_dir: str, mgrs_tile: str, band: str, out_f
 
     if crs is None or transform is None or g_nrows is None or g_ncols is None:
         raise LookupError(f'Could not determine the following projection attributes from the available '
-                          f'sentinel2 files in {input_dir}: \n' \
+                          f'sentinel2 files in {in_dir}: \n' \
                           f'{"CRS" if crs is None else ""} '
                           f'{"Transform" if transform is None else ""} '
                           f'{"Number of rows" if g_nrows is None else ""} '
@@ -214,7 +215,7 @@ def create_cloud_cleaned_composite(in_dir: str, mgrs_tile: str, band: str, out_f
         corrected_stack = np.vstack([img.ravel() for img in cloud_correct_imgs])
         median_corrected = np.nanmedian(corrected_stack, axis=0, overwrite_input=True)
         median_corrected = median_corrected.reshape(cloud_correct_imgs[0].shape)
-        with rasterio.open(slice_file_.archive_path, 'w', driver='GTiff', width=g_ncols, height=g_nrows,
+        with rasterio.open(slice_file_path, 'w', driver='GTiff', width=g_ncols, height=g_nrows,
                            count=1, crs=crs, transform=transform, dtype=np.float32) as wf:
             wf.write(median_corrected.astype(np.float32), 1)
         
@@ -245,6 +246,38 @@ def create_cloud_cleaned_composite(in_dir: str, mgrs_tile: str, band: str, out_f
     print(f'Wrote file to {out_file}')
 
 ```
+
+Let's run an example now, using the files downloaded in the sentinel2 on aws
+tutorial for mgrs 36NUG and band B02. A figure of the file structure is included
+above. Make sure to change the in_dir and out_file parameters to match your environment.
+
+``` {python}
+create_cloud_cleaned_composite(in_dir=<your_in_dir>, mgrs_tile='36NUG', band='B02', out_file='test.tif')
+```
+
+This should create an output file called test.tif in your working directory that is cloud cleaned.
+Let's take a look at the results.  
+
+First, let's look at the sentinel2 B02 file used from each day:  
+
+![36NUG B02 6_17](36_nug_6_17.png "36NUG B02 6_17")
+![36NUG B02 6_24](36_nug_6_24.png "36NUG B02 6_24")
+![36NUG B02 6_27](36_nug_6_27.png "36NUG B02 6_27")
+
+As you can see there are many clouds, and sometimes the image is not fully populated with values.
+
+Let us now look at the output file, test.tif, and see if the clouds were removed and the images stitched together.
+![36NUG B02 Cloud Corrected](36_nug_cc.png "36NUG B02 Cloud Corrected")
+
+We can see that all of the areas that used to be clouds are now NaN, or white in the image. As stated previously, 
+to get a full image with no NaNs may require months worth of data. It is achievable with this code, but too much for this tutuorial.
+Over several months there will be days where the areas now in white are not covered by clouds, and thus the median of those days pixels
+will begin to fill in the white spots until you have a full image. 
+
+
+
+
+
 
 
 
