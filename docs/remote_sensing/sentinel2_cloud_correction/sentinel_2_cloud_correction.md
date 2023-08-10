@@ -204,7 +204,7 @@ def create_cloud_cleaned_composite(in_dir: str, mgrs_tile: str, band: str, out_f
             # Get data from files
             optical_file = file_set[0]
             cloud_file = file_set[1]
-            pixels = get_img_from_file(optical_file, g_ncols, dtype, row_bound)
+            pixels = get_img_from_file(optical_file, g_ncols, np.float32, row_bound)
             cloud_channels = get_cloud_mask_from_file(cloud_file, crs, transform, (g_nrows, g_ncols), row_bound)
             if cloud_channels is None:
                 continue
@@ -215,8 +215,8 @@ def create_cloud_cleaned_composite(in_dir: str, mgrs_tile: str, band: str, out_f
         median_corrected = np.nanmedian(corrected_stack, axis=0, overwrite_input=True)
         median_corrected = median_corrected.reshape(cloud_correct_imgs[0].shape)
         with rasterio.open(slice_file_.archive_path, 'w', driver='GTiff', width=g_ncols, height=g_nrows,
-                           count=1, crs=crs, transform=transform, dtype=dtype) as wf:
-            wf.write(median_corrected.astype(dtype), 1)
+                           count=1, crs=crs, transform=transform, dtype=np.float32) as wf:
+            wf.write(median_corrected.astype(np.float32), 1)
         
         # release mem
         median_corrected = []
@@ -226,7 +226,7 @@ def create_cloud_cleaned_composite(in_dir: str, mgrs_tile: str, band: str, out_f
 
     # Combine slices
     with rasterio.open(out_file, 'w', driver='GTiff', width=g_ncols, height=g_nrows,
-                       count=1, crs=crs, transform=transform, dtype=dtype) as wf:
+                       count=1, crs=crs, transform=transform, dtype=np.float32) as wf:
         for slice_file in os.listdir(slice_dir):
             bound_split = slice_file.split('.')[0].split('_')
             top_bound = int(bound_split[0])
