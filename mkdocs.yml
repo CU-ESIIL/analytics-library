@@ -14,7 +14,7 @@ copyright: 'Copyright &copy; 2023 University of Colorado Boulder'
 nav:
   - Home: index.md
   - Remote Sensing:
-      - How to Cloud Correct Sentinel-2 Images: remote_sensing/sentinel_2_cloud_correction/sentinel_2_cloud_correction.md
+      - How to Cloud Correct Sentinel-2 Images: remote_sensing/sentinel2_cloud_correction/sentinel_2_cloud_correction.md
 
 # Configuration
 theme:
