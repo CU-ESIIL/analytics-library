@@ -9,7 +9,7 @@ A popular approach to producing a cloud-cleaned image over a particular region i
 together a time series of images to create a composite. 
 
 In this tutorial, we will create cloud-cleaned composites from Sentinel2 Level-1 C data
-acquired by the methods described at https://cu-esiil.github.io/data-library/reomte_sensing/sentinel2_aws/sentinel2_aws. 
+acquired by the methods described at https://data-library.esiil.org/reomte_sensing/sentinel2_aws/sentinel2_aws. 
 
 The steps to creating a cloud-cleaned composite are outlined as:  
 
@@ -271,7 +271,7 @@ Let us now look at the output file, test.tif, and see if the clouds were removed
 
 We can see that all of the areas that used to be clouds are now NaN, or white in the image. As stated previously, 
 to get a full image with no NaNs may require months worth of data. It is achievable with this code, but too much for this tutuorial.
-Over several months there will be days where the areas now in white are not covered by clouds, and thus the median of those days pixels
+Over several months there will be days where the areas now in white are not covered by clouds, and thus the median of those days' pixels
 will begin to fill in the white spots until you have a full image. 
 
 
