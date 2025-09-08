@@ -1,7 +1,16 @@
-Creating Cloud Corrected Sentinel-2 Images 
-================
-Erick Verleye, ESIIL Software Developer  
-2023-08-08  
+---
+title: Creating Cloud Corrected Sentinel-2 Images
+authors:
+  - Erick Verleye
+date: 2023-08-08
+tags:
+  - remote-sensing
+  - sentinel-2
+  - cloud-correction
+---
+
+# Creating Cloud Corrected Sentinel-2 Images
+Erick Verleye, ESIIL Software Developer
 
 A common issue when working with remote imaging data is that for a single image,
 it is likely that the instrument's field of view is at least partially occulted by clouds.
