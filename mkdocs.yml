@@ -15,7 +15,6 @@ nav:
   - Home: index.md
   - Remote Sensing:
       - How to Cloud Correct Sentinel-2 Images: remote_sensing/sentinel2_cloud_correction/sentinel_2_cloud_correction.md
-  - Tags: tags.md
   - Style Guide: style-guide.md
 
 # Configuration
@@ -37,7 +36,6 @@ theme:
     - toc.integrate
     - toc.follow
     - content.code.copy
-    - content.tags
   # Default values, taken from mkdocs_theme.yml
   language: en
   palette:
@@ -82,10 +80,6 @@ extra_css:
 
 plugins:
     - search
-    - tags
     - mkdocstrings
     - git-revision-date
-    - mkdocs-jupyter:
-          include_source: True
-          ignore_h1_titles: True
     - no-sitemap
