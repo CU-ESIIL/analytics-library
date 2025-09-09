@@ -1,5 +1,5 @@
 ---
-title: PRISM Tipping-Point Forecast: A Textbook-Style Guide
+title: "PRISM Tipping-Point Forecast: A Textbook-Style Guide"
 authors:
   - ESIIL Analytics Team
 date: 2025-09-09
@@ -8,6 +8,7 @@ tags:
   - forecasting
   - tipping-points
   - climate
+  - innovation-summit-2025
 ---
 
 # PRISM Tipping-Point Forecast: A Textbook-Style Guide
