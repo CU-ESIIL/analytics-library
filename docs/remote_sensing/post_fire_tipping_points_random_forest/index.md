@@ -15,6 +15,8 @@ tags:
 
 # Burning Boundaries: Random Forest Early Warnings for Post-Fire Collapse
 
+![Random Forest NDVI Fire](images/random_forest_nvdi_fire.png)
+
 ## Introduction
 
 Wildfires can push ecosystems across **tipping points**—for example, from forests to shrublands—when vegetation fails to recover after disturbance. This analytics entry describes a reproducible workflow that:
@@ -931,4 +933,3 @@ def produce_figures(
 # display(fig_facets)
 ```
 
-![Random Forest NDVI Fire](images/random_forest_nvdi_fire.png)
