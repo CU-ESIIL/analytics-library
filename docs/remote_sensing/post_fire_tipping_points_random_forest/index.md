@@ -930,3 +930,5 @@ def produce_figures(
 # )
 # display(fig_facets)
 ```
+
+![Random Forest NDVI Fire](images/random_forest_nvdi_fire.png)
