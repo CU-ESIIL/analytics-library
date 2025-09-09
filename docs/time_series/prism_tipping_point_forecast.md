@@ -1,5 +1,5 @@
 ---
-title: "PRISM Tipping-Point Forecast: A Textbook-Style Guide"
+title: "Finding Breaks and Forecasting Climate data using PRISM"
 authors:
   - ESIIL Analytics Team
 date: 2025-09-09
@@ -11,7 +11,7 @@ tags:
   - innovation-summit-2025
 ---
 
-# PRISM Tipping-Point Forecast: A Textbook-Style Guide
+# Finding Breaks and Forecasting Climate data using PRISM
 
 ## Introduction
 Climate systems are often assumed to change gradually, but in many cases they exhibit **abrupt shifts** or **“tipping points”** where the rate of change accelerates or decelerates. Detecting and forecasting such breaks in climate time series is important for understanding regional climate impacts, anticipating ecosystem stress, and informing adaptation planning. This workflow combines data streaming, change-point detection, and time-series forecasting to provide a reproducible way of investigating potential tipping points in observed climate records.
