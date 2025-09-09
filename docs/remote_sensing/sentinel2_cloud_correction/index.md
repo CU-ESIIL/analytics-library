@@ -29,7 +29,7 @@ The steps to creating a cloud-cleaned composite are outlined as:
 
 First let's look at the file structure created after downloading the data:  
 
-![Uganda Sentinel-2 File Structure](Uganda_s2_files.png "Uganda Sentinel-2 Files")
+![Uganda Sentinel-2 File Structure](images/Uganda_s2_files.png "Uganda Sentinel-2 Files")
 
 There is information about the location, date, and file contents in the file name.
 The structure is <military_grid_tile>_<date>_<file_contents>. For example, the file
@@ -269,14 +269,14 @@ Let's take a look at the results.
 
 First, let's look at the sentinel2 B02 file used from each day:  
 
-![36NUG B02 6_17](36_nug_6_17.png "36NUG B02 6_17")
-![36NUG B02 6_24](36_nug_6_24.png "36NUG B02 6_24")
-![36NUG B02 6_27](36_nug_6_27.png "36NUG B02 6_27")
+![36NUG B02 6_17](images/36_nug_6_17.png "36NUG B02 6_17")
+![36NUG B02 6_24](images/36_nug_6_24.png "36NUG B02 6_24")
+![36NUG B02 6_27](images/36_nug_6_27.png "36NUG B02 6_27")
 
 As you can see there are many clouds, and sometimes the image is not fully populated with values.
 
 Let us now look at the output file, test.tif, and see if the clouds were removed and the images stitched together.
-![36NUG B02 Cloud Corrected](36_nug_cc.png "36NUG B02 Cloud Corrected")
+![36NUG B02 Cloud Corrected](images/36_nug_cc.png "36NUG B02 Cloud Corrected")
 
 We can see that all of the areas that used to be clouds are now NaN, or white in the image. As stated previously, 
 to get a full image with no NaNs may require months worth of data. It is achievable with this code, but too much for this tutuorial.
