@@ -506,3 +506,330 @@ def plot_prism_tipping_point_forecast(
 # Example:
 fig, info, series = plot_prism_tipping_point_forecast(place="Boulder, CO", start="1981-01", max_forecast_years=20)
 ```
+
+```r
+# PRISM tipping-point forecast in R (VSI + month backoff + scale/offset safe)
+# ---------------------------------------------------------------------------
+# Suggested mamba installs (terminal):
+#   mamba install -c conda-forge r-terra r-ggplot2 r-lubridate r-dplyr r-tidyr r-forecast r-scales
+# Optional:
+#   mamba install -c conda-forge r-strucchange        # breakpoints (preferred)
+#   mamba install -c conda-forge r-changepoint        # alternative break detector
+#   mamba install -c conda-forge r-tidygeocoder       # place="City, ST" support
+
+suppressPackageStartupMessages({
+  library(terra)
+  library(ggplot2)
+  library(lubridate)
+  library(dplyr)
+  library(tidyr)
+  library(forecast)
+  library(scales)
+})
+
+# ---------- PRISM helpers (VSI) ----------
+.res_code <- c("4km"="25m","800m"="30s","400m"="15s")
+
+.as_datecode <- function(date, freq=c("monthly","daily","annual")){
+  freq <- match.arg(freq)
+  if (inherits(date, c("Date","POSIXt"))) {
+    d <- as.Date(date)
+  } else if (is.character(date)) {
+    s <- trimws(date)
+    if (freq=="daily"){
+      if (grepl("^\\d{4}-\\d{2}-\\d{2}$", s)) d <- as.Date(s)
+      else d <- as.Date(s, format="%Y%m%d")
+    } else if (freq=="monthly"){
+      if (grepl("^\\d{4}-\\d{2}$", s)) d <- as.Date(paste0(s,"-01"))
+      else d <- as.Date(paste0(s,"01"), format="%Y%m%d")
+    } else {
+      d <- as.Date(paste0(s,"-01-01"))
+    }
+  } else stop("date must be character or Date/POSIXt")
+
+  if (freq=="daily") list(datecode=format(d,"%Y%m%d"), yyyy=format(d,"%Y"))
+  else if (freq=="monthly") list(datecode=format(d,"%Y%m"), yyyy=format(d,"%Y"))
+  else list(datecode=format(d,"%Y"), yyyy=format(d,"%Y"))
+}
+
+build_prism_vsi <- function(variable="tmean",
+                            date="2025-06",
+                            resolution="4km",
+                            region="us",
+                            freq="monthly",
+                            network="an"){
+  if (!resolution %in% names(.res_code)) stop("resolution must be one of {'800m','4km','400m'}")
+  dc <- .as_datecode(date, freq=freq)
+  res_token <- unname(.res_code[[resolution]])
+  base_dir <- sprintf("https://data.prism.oregonstate.edu/time_series/%s/%s/%s/%s/%s/%s/",
+                      region, network, resolution, variable, freq, dc$yyyy)
+  zip_name <- sprintf("prism_%s_%s_%s_%s.zip", variable, region, res_token, dc$datecode)
+  tif_name <- sprintf("prism_%s_%s_%s_%s.tif",  variable, region, res_token, dc$datecode)
+  sprintf("/vsizip//vsicurl/%s%s/%s", base_dir, zip_name, tif_name)
+}
+
+safe_default_end_month <- function(end=NULL){
+  if (!is.null(end)) return(end)
+  today <- floor_date(Sys.Date(), "month")
+  format(today - months(1), "%Y-%m")
+}
+
+# Scale/offset helper:
+apply_scale_sanity <- function(x){
+  if (all(is.na(x))) return(NA_real_)
+  v <- as.numeric(x)[1]
+  if (is.na(v)) return(NA_real_)
+  # If values look like degC*10, normalize
+  if (abs(v) > 120) v <- v / 10.0
+  # sanity bound
+  if (v < -100 || v > 100) return(NA_real_)
+  v
+}
+
+sample_prism_month <- function(lat, lon, when, max_back=6L){
+  # Try target month, then step back up to max_back months
+  for (b in 0:max_back){
+    ts_try <- as.Date(floor_date(as.Date(when), "month") - months(b))
+    vsi <- build_prism_vsi(variable="tmean", date=ts_try, resolution="4km",
+                           region="us", freq="monthly", network="an")
+    r <- tryCatch(terra::rast(vsi), error=function(e) NULL)
+    if (is.null(r)) next
+    val <- tryCatch({
+      extract(r, matrix(c(lon, lat), ncol=2))[,2, drop=TRUE]
+    }, error=function(e) NA_real_)
+    val <- apply_scale_sanity(val)
+    if (!is.na(val)) return(val)
+  }
+  return(NA_real_)
+}
+
+fill_single_gaps <- function(x){
+  # Only fill isolated NA flanked by numbers; leave longer runs as NA
+  if (length(x) < 3) return(x)
+  y <- x
+  for (i in 2:(length(x)-1)){
+    if (is.na(x[i]) && !is.na(x[i-1]) && !is.na(x[i+1])){
+      y[i] <- 0.5*(x[i-1]+x[i+1])
+    }
+  }
+  y
+}
+
+stream_prism_monthly_tmean <- function(lat, lon, start="1981-01", end=NULL){
+  end <- safe_default_end_month(end)
+  idx <- seq(from=as.Date(paste0(start,"-01")),
+             to=as.Date(paste0(end,"-01")),
+             by="1 month")
+  vals <- vapply(idx, function(d) sample_prism_month(lat, lon, d), numeric(1))
+  keep <- !is.na(vals)
+  if (!any(keep)) stop("No PRISM monthly samples could be read for the requested location/range.")
+  df <- tibble::tibble(date=idx, tmean_c=vals)
+  df$tmean_c <- fill_single_gaps(df$tmean_c)
+  df %>% filter(!is.na(tmean_c)) %>% arrange(date)
+}
+
+# ---------- Optional geocoding ----------
+# If tidygeocoder is installed, use it; else try a tiny built-in lookup; else stop.
+.geocode_builtin <- tibble::tibble(
+  place = c("Boulder, CO","Denver, CO","Phoenix, AZ","Seattle, WA","New York, NY","Los Angeles, CA"),
+  lat   = c(40.0150, 39.7392, 33.4484, 47.6062, 40.7128, 34.0522),
+  lon   = c(-105.2705,-104.9903,-112.0740,-122.3321,-74.0060,-118.2437)
+)
+
+geocode_place <- function(place){
+  if (requireNamespace("tidygeocoder", quietly=TRUE)){
+    res <- tidygeocoder::geocode(address=place, method="osm", quiet=TRUE)
+    if (nrow(res)>0 && !is.na(res$lat[1]) && !is.na(res$long[1])) {
+      return(c(lat=res$lat[1], lon=res$long[1]))
+    }
+  }
+  hit <- .geocode_builtin %>% filter(tolower(place)==tolower(.data$place))
+  if (nrow(hit)==1) return(c(lat=hit$lat, lon=hit$lon))
+  stop("Geocoding failed; install 'tidygeocoder' (or add to built-in lookup) or pass lat/lon.")
+}
+
+# ---------- Change-point detection (one break) ----------
+# Strategy: try strucchange -> changepoint -> OLS fallback
+
+detect_breakpoint <- function(df_monthly){
+  y <- df_monthly$tmean_c
+  t <- seq_along(y)
+
+  # 1) strucchange (slope break in linear trend)
+  if (requireNamespace("strucchange", quietly=TRUE)){
+    dat <- data.frame(y=y, t=t)
+    bp <- tryCatch(strucchange::breakpoints(y ~ t, data=dat, h=max(12, floor(length(y)/12))),
+                   error=function(e) NULL)
+    k <- if (!is.null(bp) && length(bp$breakpoints)>0) bp$breakpoints[1] else NA_integer_
+    if (!is.na(k) && k >= 6 && k <= (length(y)-6)) return(df_monthly$date[k])
+  }
+
+  # 2) changepoint (mean/var break)
+  if (requireNamespace("changepoint", quietly=TRUE)){
+    cp <- tryCatch(changepoint::cpt.meanvar(y, method="PELT", penalty="SIC"),
+                   error=function(e) NULL)
+    k <- if (!is.null(cp) && length(changepoint::cpts(cp))>0) changepoint::cpts(cp)[1] else NA_integer_
+    if (!is.na(k) && k >= 6 && k <= (length(y)-6)) return(df_monthly$date[k])
+  }
+
+  # 3) OLS segmented fallback: pick k minimizing RSS with two lines
+  ols_line <- function(x, y){
+    X <- cbind(1, x)
+    coef <- tryCatch(solve(t(X)%*%X, t(X)%*%y), error=function(e) c(NA,NA))
+    yhat <- as.vector(X%*%coef)
+    rss <- sum((y-yhat)^2)
+    list(a=coef[1], b=coef[2], rss=rss)
+  }
+  n <- length(y)
+  window <- max(12, floor(n/12))
+  best_k <- NA; best_rss <- Inf
+  for (k in seq(window, n-window)){
+    left  <- ols_line(t[1:k], y[1:k])$rss
+    right <- ols_line(t[(k+1):n], y[(k+1):n])$rss
+    tot <- left + right
+    if (!is.na(tot) && tot < best_rss){ best_rss <- tot; best_k <- k }
+  }
+  if (is.na(best_k) || best_k < 6 || best_k > (n-6)) return(NULL)
+  df_monthly$date[best_k]
+}
+
+# ---------- Rolling-origin backtest ----------
+rolling_rmse <- function(ts_y, fit_fn, steps=12, min_train=120){
+  n <- length(ts_y)
+  errs <- c()
+  for (end in seq(min_train, n-steps, by=steps)){
+    train <- ts_y[1:end]
+    test  <- ts_y[(end+1):(end+steps)]
+    fc <- tryCatch(fit_fn(train, horizon=length(test)), error=function(e) rep(NA_real_, length(test)))
+    if (length(fc) == length(test) && all(!is.na(fc))) {
+      errs <- c(errs, sqrt(mean((fc - test)^2)))
+    }
+  }
+  if (length(errs)==0) Inf else mean(errs)
+}
+
+# ---------- Candidate model wrappers ----------
+fit_predict_ets <- function(train, horizon, return_pi=FALSE){
+  m <- forecast::ets(train, model="AAA")
+  fc <- forecast::forecast(m, h=horizon, level=90)
+  if (return_pi) list(mean=as.numeric(fc$mean), lo=as.numeric(fc$lower[,1]), hi=as.numeric(fc$upper[,1]),
+                      label="ETS(A,A,A)", aic=AIC(m))
+  else as.numeric(fc$mean)
+}
+
+fit_predict_stl_arima <- function(train, horizon, return_pi=FALSE){
+  m <- forecast::stlm(train, method="arima")
+  fc <- forecast::forecast(m, h=horizon, level=90)
+  if (return_pi) list(mean=as.numeric(fc$mean), lo=as.numeric(fc$lower[,1]), hi=as.numeric(fc$upper[,1]),
+                      label="STL + ARIMA", aic=NA_real_)
+  else as.numeric(fc$mean)
+}
+
+fit_predict_auto_arima <- function(train, horizon, return_pi=FALSE){
+  m <- forecast::auto.arima(train, seasonal=TRUE, stepwise=TRUE, approximation=FALSE)
+  fc <- forecast::forecast(m, h=horizon, level=90)
+  if (return_pi) list(mean=as.numeric(fc$mean), lo=as.numeric(fc$lower[,1]), hi=as.numeric(fc$upper[,1]),
+                      label=sprintf("auto.arima %s", paste(forecast::arimaorder(m), collapse=",")),
+                      aic=AIC(m))
+  else as.numeric(fc$mean)
+}
+
+# ---------- Main function ----------
+plot_prism_tipping_point_forecast <- function(place=NULL,
+                                              lat=NULL, lon=NULL,
+                                              start="1981-01",
+                                              end=NULL,
+                                              max_forecast_years=20,
+                                              detect_break=TRUE,
+                                              seed=1337){
+  set.seed(seed)
+  if (is.null(place) && (is.null(lat) || is.null(lon)))
+    stop("Provide either a place name OR both lat and lon.")
+  if (!is.null(place) && (is.null(lat) || is.null(lon))){
+    coords <- tryCatch(geocode_place(place), error=function(e) NULL)
+    if (is.null(coords)) stop("Geocoding failed; install 'tidygeocoder' (or add to built-in lookup) or pass lat/lon.")
+    lat <- coords["lat"]; lon <- coords["lon"]
+  }
+
+  df <- stream_prism_monthly_tmean(lat, lon, start=start, end=end)
+  if (nrow(df) < 60) stop("Need at least ~5 years of monthly data for stable forecasting.")
+
+  # Break detection
+  bp_date <- if (detect_break) detect_breakpoint(df) else NULL
+
+  # Monthly ts (freq=12)
+  y_ts <- ts(df$tmean_c, start=c(year(min(df$date)), month(min(df$date))), frequency=12)
+
+  # Candidates
+  fitA <- function(z, horizon) fit_predict_auto_arima(z, horizon)
+  fitB <- function(z, horizon) fit_predict_stl_arima(z, horizon)
+  fitC <- function(z, horizon) fit_predict_ets(z, horizon)
+
+  base_min_train <- min(120, max(72, floor(length(y_ts)/2)))
+  rmseA <- rolling_rmse(y_ts, fitA, steps=12, min_train=base_min_train)
+  rmseB <- rolling_rmse(y_ts, fitB, steps=12, min_train=base_min_train)
+  rmseC <- rolling_rmse(y_ts, fitC, steps=12, min_train=base_min_train)
+
+  scores <- tibble::tibble(model=c("auto.arima","STL+ARIMA","ETS"),
+                           rmse=c(rmseA, rmseB, rmseC))
+  winner <- scores$model[which.min(scores$rmse)]
+
+  horizon <- max_forecast_years * 12
+  if (winner=="ETS"){
+    res <- fit_predict_ets(y_ts, horizon, return_pi=TRUE)
+  } else if (winner=="STL+ARIMA"){
+    res <- fit_predict_stl_arima(y_ts, horizon, return_pi=TRUE)
+  } else {
+    res <- fit_predict_auto_arima(y_ts, horizon, return_pi=TRUE)
+  }
+
+  # Build forecast df with dates
+  last_month <- max(df$date)
+  fidx <- seq(from=last_month %m+% months(1), by="1 month", length.out=horizon)
+  fc_df <- tibble::tibble(date=fidx, mean=res$mean, lo=res$lo, hi=res$hi)
+
+  # Plot
+  C_OBS <- "#1f77b4"; C_BREAK <- "#d62728"; C_FC <- "#2ca02c"; C_PI <- "#a6dba0"
+
+  p <- ggplot() +
+    geom_line(data=df, aes(date, tmean_c), color=C_OBS, linewidth=0.7) +
+    { if (!is.null(bp_date)) geom_vline(xintercept=as.numeric(bp_date), color=C_BREAK, linetype="dashed") } +
+    geom_ribbon(data=fc_df, aes(date, ymin=lo, ymax=hi), fill=C_PI, alpha=0.35) +
+    geom_line(data=fc_df, aes(date, mean), color=C_FC, linewidth=0.8) +
+    scale_x_date(date_breaks = "5 years", date_labels = "%Y", expand=expansion(mult=c(0.01,0.02))) +
+    labs(x="Year", y="Monthly mean temperature (°C)",
+         title = sprintf("PRISM tmean at %s",
+                         if (!is.null(place)) place else sprintf("%.4f, %.4f", lat, lon)),
+         subtitle = sprintf("Data: %s to %s  •  Break: %s  •  Model: %s  •  RMSE (val): %s",
+                            format(min(df$date), "%Y-%m"),
+                            format(max(df$date), "%Y-%m"),
+                            if (!is.null(bp_date)) format(bp_date, "%Y-%m") else "none",
+                            winner, scales::comma(min(scores$rmse)))) +
+    theme_minimal(base_size = 11) +
+    theme(panel.grid.minor = element_blank())
+
+  print(p)
+
+  list(plot=p,
+       model_info=list(winner=winner, rmse_validation=min(scores$rmse), label=winner),
+       series=df)
+}
+
+# ----------------------------
+# Examples:
+# ----------------------------
+
+# 1) With coordinates (no extra installs):
+out <- plot_prism_tipping_point_forecast(
+   lat = 40.015, lon = -105.2705,   # Boulder, CO
+   start = "1981-01",
+   max_forecast_years = 20
+ )
+
+# 2) With place name (install tidygeocoder first, or rely on built-in few-city lookup):
+# out <- plot_prism_tipping_point_forecast(
+#   place = "Boulder, CO",
+#   start = "1981-01",
+#   max_forecast_years = 20
+# )
+```
