@@ -13,6 +13,8 @@ tags:
 
 # Finding Breaks and Forecasting Climate data using PRISM
 
+![PRISM forecast with detected breakpoint](images/forecast_and_breakpoint.png)
+
 ## Introduction
 Climate systems are often assumed to change gradually, but in many cases they exhibit **abrupt shifts** or **“tipping points”** where the rate of change accelerates or decelerates. Detecting and forecasting such breaks in climate time series is important for understanding regional climate impacts, anticipating ecosystem stress, and informing adaptation planning. This workflow combines data streaming, change-point detection, and time-series forecasting to provide a reproducible way of investigating potential tipping points in observed climate records.
 
@@ -507,7 +509,6 @@ def plot_prism_tipping_point_forecast(
 fig, info, series = plot_prism_tipping_point_forecast(place="Boulder, CO", start="1981-01", max_forecast_years=20)
 ```
 
-![PRISM forecast with detected breakpoint](images/forecast_and_breakpoint.png)
 
 ```r
 # PRISM tipping-point forecast in R (VSI + month backoff + scale/offset safe)
