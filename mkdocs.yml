@@ -19,8 +19,8 @@ theme:
   font:
     text: Open Sans
     code: Roboto Mono
-  logo: assets/ESIIL_logo.png
-  favicon: assets/favicon.ico
+  logo: ESIIL_logo.png
+  favicon: favicon.ico
   features:
   - navigation.sections
   - navigation.instant
