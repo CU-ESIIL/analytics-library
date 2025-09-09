@@ -507,6 +507,8 @@ def plot_prism_tipping_point_forecast(
 fig, info, series = plot_prism_tipping_point_forecast(place="Boulder, CO", start="1981-01", max_forecast_years=20)
 ```
 
+![Forecast and breakpoint](images/forecast_and_breakpoint.png)
+
 ```r
 # PRISM tipping-point forecast in R (VSI + month backoff + scale/offset safe)
 # ---------------------------------------------------------------------------
