@@ -1,85 +1,70 @@
-site_name: 'ESIIL Analytics Library'
-site_description: 'Analysis Modules for Environmental Data Science'
+site_name: ESIIL Analytics Library
+site_description: Analysis Modules for Environmental Data Science
 site_author: ESIIL CI team (lead = Ty Tuff)
 site_url: https://cu-esiil.github.io/analytics-library
-
-# Repository
 repo_name: analytics-library
 repo_url: https://github.com/cu-esiil/analytics-library
 edit_uri: edit/main/docs/
-# Copyright
-copyright: 'Copyright &copy; 2023 University of Colorado Boulder'
-
-# Page tree
+copyright: Copyright &copy; 2023 University of Colorado Boulder
 nav:
-  - Home: index.md
-  - Remote Sensing:
-      - How to Cloud Correct Sentinel-2 Images: remote_sensing/sentinel2_cloud_correction/sentinel_2_cloud_correction.md
-  - Style Guide: style-guide.md
-
-# Configuration
+- Innovation Summit 2025: innovation-summit-2025.md
+- Home: index.md
+- Topics:
+  - forecasting: topic/forecasting.md
+  - time-series: topic/time-series.md
+- Tags: tags.md
 theme:
   highlightjs: true
   name: material
   font:
-    text: 'Open Sans'
-    code: 'Roboto Mono'
-  logo: 'assets/ESIIL_logo.png'
-  favicon: 'assets/favicon.ico'
-  # setting features for the navigation tab
+    text: Open Sans
+    code: Roboto Mono
+  logo: assets/ESIIL_logo.png
+  favicon: assets/favicon.ico
   features:
-    - navigation.sections
-    - navigation.instant
-    - navigation.tracking
-    - navigation.indexes
-    - navigation.top
-    - toc.integrate
-    - toc.follow
-    - content.code.copy
-  # Default values, taken from mkdocs_theme.yml
+  - navigation.sections
+  - navigation.instant
+  - navigation.tracking
+  - navigation.indexes
+  - navigation.top
+  - toc.integrate
+  - toc.follow
+  - content.code.copy
   language: en
   palette:
-    # Palette toggle for light mode
-    - media: "(prefers-color-scheme: white)"
-      primary: 'white'
-      toggle:
-        icon: material/weather-night
-        name: Switch to dark mode
-
-    # Palette toggle for dark mode
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      toggle:
-        icon: material/weather-sunny
-        name: Switch to system preference
-
-# Options
+  - media: '(prefers-color-scheme: white)'
+    primary: white
+    toggle:
+      icon: material/weather-night
+      name: Switch to dark mode
+  - media: '(prefers-color-scheme: dark)'
+    scheme: slate
+    toggle:
+      icon: material/weather-sunny
+      name: Switch to system preference
 extra:
   social:
-    - icon: fontawesome/brands/github
-      link: https://github.com/cu-esiil/
+  - icon: fontawesome/brands/github
+    link: https://github.com/cu-esiil/
   analytics:
     provider: google
     property: G-KPW08MT0F2
     feedback:
       title: Was this page helpful?
       ratings:
-        - icon: material/thumb-up-outline
-          name: This page was helpful
-          data: 1
-          note: >-
-            Thanks for your feedback!
-        - icon: material/thumb-down-outline
-          name: This page could be improved
-          data: -1
-          note: >- 
-            Thanks for your feedback! Help us improve this page by
-            using our <a href="..." target="_blank" rel="noopener">feedback form</a>.  
+      - icon: material/thumb-up-outline
+        name: This page was helpful
+        data: 1
+        note: Thanks for your feedback!
+      - icon: material/thumb-down-outline
+        name: This page could be improved
+        data: -1
+        note: 'Thanks for your feedback! Help us improve this page by using our <a
+          href="..." target="_blank" rel="noopener">feedback form</a>.  '
 extra_css:
-  - stylesheets/extra.css
-
+- stylesheets/extra.css
 plugins:
-    - search
-    - mkdocstrings
-    - git-revision-date
-    - no-sitemap
+- search
+- mkdocstrings
+- git-revision-date
+- no-sitemap
