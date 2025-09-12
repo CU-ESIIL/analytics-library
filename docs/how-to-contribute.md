@@ -10,5 +10,7 @@ tags:
 
 # How to Contribute
 
-This page is a placeholder for contribution guidelines. Detailed instructions on how to contribute to the Analytics Library will be added soon.
+For guidelines on contributing to this project, please visit our dedicated contribution page:
+
+[https://cu-esiil.github.io/how_to_contribute/](https://cu-esiil.github.io/how_to_contribute/)
 

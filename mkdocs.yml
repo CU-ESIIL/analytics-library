@@ -13,7 +13,7 @@ nav:
   - forecasting: topic/forecasting.md
   - time-series: topic/time-series.md
 - Tags: tags.md
-- How to Contribute: how-to-contribute.md
+- How to Contribute: https://cu-esiil.github.io/how_to_contribute/
 theme:
   highlightjs: true
   name: material
