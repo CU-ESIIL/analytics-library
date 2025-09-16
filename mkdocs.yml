@@ -20,7 +20,7 @@ theme:
   font:
     text: Open Sans
     code: Roboto Mono
-  logo: ESIIL_logo.png
+  logo: https://raw.githubusercontent.com/CU-ESIIL/data-library/main/docs/assets/esiil_oasis_logo.png
   favicon: favicon.ico
   features:
   - navigation.sections
