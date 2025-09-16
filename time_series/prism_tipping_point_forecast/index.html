@@ -1,0 +1,1451 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Analysis Modules for Environmental Data Science">
+      
+      
+        <meta name="author" content="ESIIL CI team (lead = Ty Tuff)">
+      
+      
+        <link rel="canonical" href="https://cu-esiil.github.io/analytics-library/time_series/prism_tipping_point_forecast/">
+      
+      
+      
+      
+      <link rel="icon" href="../../favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.20">
+    
+    
+      
+        <title>Finding Breaks and Forecasting Climate data using PRISM - ESIIL Analytics Library</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.e53b48f4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Open Sans";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-KPW08MT0F2"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-KPW08MT0F2",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-KPW08MT0F2",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#finding-breaks-and-forecasting-climate-data-using-prism" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="https://cu-esiil.github.io/home/" title="ESIIL Analytics Library" class="md-header__button md-logo" aria-label="ESIIL Analytics Library" data-md-component="logo">
+      
+  <img src="https://raw.githubusercontent.com/CU-ESIIL/data-library/main/docs/assets/esiil_oasis_logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            ESIIL Analytics Library
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Finding Breaks and Forecasting Climate data using PRISM
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: white)" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/cu-esiil/analytics-library" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    analytics-library
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://cu-esiil.github.io/home/" title="ESIIL Analytics Library" class="md-nav__button md-logo" aria-label="ESIIL Analytics Library" data-md-component="logo">
+      
+  <img src="https://raw.githubusercontent.com/CU-ESIIL/data-library/main/docs/assets/esiil_oasis_logo.png" alt="logo">
+
+    </a>
+    ESIIL Analytics Library
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/cu-esiil/analytics-library" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    analytics-library
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../innovation-summit-2025/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Innovation Summit 2025
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Topics
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Topics
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../topic/forecasting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    forecasting
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../topic/time-series/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    time-series
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tags/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tags
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://cu-esiil.github.io/how_to_contribute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    How to Contribute
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="finding-breaks-and-forecasting-climate-data-using-prism">Finding Breaks and Forecasting Climate data using PRISM</h1>
+<p><img alt="PRISM forecast with detected breakpoint" src="images/forecast_and_breakpoint.png" /></p>
+<h2 id="introduction">Introduction</h2>
+<p>Climate systems are often assumed to change gradually, but in many cases they exhibit <strong>abrupt shifts</strong> or <strong>“tipping points”</strong> where the rate of change accelerates or decelerates. Detecting and forecasting such breaks in climate time series is important for understanding regional climate impacts, anticipating ecosystem stress, and informing adaptation planning. This workflow combines data streaming, change-point detection, and time-series forecasting to provide a reproducible way of investigating potential tipping points in observed climate records.</p>
+<h2 id="data-source-prism-climate-data">Data Source: PRISM Climate Data</h2>
+<p>We use the <strong>Parameter-elevation Regressions on Independent Slopes Model (PRISM)</strong> dataset, developed by the PRISM Climate Group at Oregon State University. PRISM provides high-resolution gridded climate data for the contiguous United States, widely used in climate research and resource management (Daly et al. 2008, <em>Int. J. Climatology</em>).</p>
+<ul>
+<li><strong>Coverage:</strong> 1981 to present (monthly time series).</li>
+<li><strong>Variables:</strong> Mean, maximum, minimum temperature, and precipitation.</li>
+<li><strong>Resolution:</strong> Typically 4 km, with finer options.</li>
+</ul>
+<p>By streaming PRISM directly via <strong>GDAL’s Virtual File System (VSI)</strong>, we avoid large downloads and enable point extraction (lat/lon or place-based geocoding) on demand.</p>
+<h2 id="why-this-matters">Why This Matters</h2>
+<ol>
+<li><strong>Tipping points in climate:</strong> Shifts in warming rates or precipitation regimes can signify new stress regimes (Steffen et al. 2018, <em>PNAS</em>).</li>
+<li><strong>Decision support:</strong> Early detection of accelerations in warming or drought is critical for water resource planning, agriculture, and fire risk management.</li>
+<li><strong>Accessible forecasting:</strong> Many users lack the statistical background to implement advanced models. This workflow packages established methods into an easy-to-use pipeline.</li>
+</ol>
+<h2 id="step-1-data-streaming">Step 1: Data Streaming</h2>
+<ul>
+<li>We extract PRISM <strong>monthly mean temperature</strong> (tmean) for a given location. </li>
+<li>Using GDAL, the script directly opens compressed <code>.zip</code> archives over HTTP without manual downloads. </li>
+<li>The code accounts for PRISM’s use of <strong>scale/offset factors</strong> in raster bands, ensuring values are converted to real degrees Celsius.  </li>
+</ul>
+<h2 id="step-2-change-point-detection">Step 2: Change-Point Detection</h2>
+<p>We ask: <strong>Has the climate trend changed significantly at some point?</strong>
+- <strong>Statistical foundation:</strong> Structural break detection in regression models (Bai &amp; Perron 2003, <em>J. Econometrics</em>). 
+- <strong>Algorithm:</strong> By default, we use the <strong>Pruned Exact Linear Time (PELT)</strong> method (Killick et al. 2012, <em>JASA</em>), implemented in the <code>ruptures</code> package (Truong et al. 2020, <em>J. Statistical Software</em>).
+- <strong>Fallback method:</strong> A custom F-test on segmented regressions compares slopes before and after each candidate break.</p>
+<p><strong>Mathematics (simplified):</strong><br />
+For time series (y_t), we test piecewise linear models:
+[
+y_t = \alpha_1 + \beta_1 t + \varepsilon_t, \quad t \le k \
+y_t = \alpha_2 + \beta_2 t + \varepsilon_t, \quad t &gt; k
+]
+We choose (k) that minimizes total residual error and test whether slopes differ significantly.</p>
+<h2 id="step-3-forecasting-models">Step 3: Forecasting Models</h2>
+<p>Forecasting is done with several standard models, then validated via rolling backtests:
+- <strong>Holt–Winters Exponential Smoothing (Additive):</strong> captures trend + seasonality (Holt 1957; Winters 1960).
+- <strong>STL + ARIMA:</strong> Seasonal–Trend decomposition with ARIMA errors (Box &amp; Jenkins 1970).
+- <strong>SARIMAX:</strong> Seasonal ARIMA with exogenous regressors, flexible for seasonal climate series.
+- <strong>Auto-ARIMA (pmdarima):</strong> Automated parameter selection (Hyndman &amp; Khandakar 2008).</p>
+<p><strong>Forecast accuracy check:</strong> We use a <strong>rolling origin cross-validation</strong> (Tashman 2000, <em>Int. J. Forecasting</em>), where earlier subsets of data are used to predict withheld observations. The model with lowest RMSE (root mean square error) is chosen.</p>
+<p><strong>Prediction intervals:</strong> Forecasts include 90% intervals, reflecting uncertainty in future outcomes.</p>
+<h2 id="step-4-visualization">Step 4: Visualization</h2>
+<p>The final plot shows:
+- <strong>Observed data</strong> (blue line).
+- <strong>Detected break</strong> (red dashed line).
+- <strong>Forecast mean</strong> (green line).
+- <strong>Prediction interval</strong> (light green band).</p>
+<p>This visualization helps both scientists and decision-makers quickly assess whether climate trends have shifted and what plausible futures look like.</p>
+<h2 id="example-use-case">Example Use Case</h2>
+<p>Suppose you want to know whether <strong>Boulder, Colorado</strong> has experienced an accelerated warming trend since 1981 and what might happen in the next 20 years:
+1. Provide <code>place="Boulder, CO"</code> and a start year.
+2. The workflow fetches PRISM monthly mean temperature.
+3. It detects whether the slope changed (e.g., around 2000s).
+4. It produces a 20-year forecast with confidence bands.</p>
+<hr />
+<h2 id="references-verified-with-context">References (verified, with context)</h2>
+<ul>
+<li>
+<p><strong>PRISM data</strong> — Daly, C., Halbleib, M., Smith, J. I., et al. (2008). <em>Physiographically sensitive mapping of temperature and precipitation across the conterminous United States</em>. <strong>International Journal of Climatology</strong>, 28(15), 2031–2064. <a href="https://doi.org/10.1002/joc.1688">DOI / Wiley</a>. Open PDF via PRISM group: <a href="https://prism.oregonstate.edu/documents/pubs/2008intjclim_physiographicMapping_daly.pdf">link</a>.<br />
+<em>Context: foundational description of PRISM dataset, which underlies all data streamed here.</em></p>
+</li>
+<li>
+<p><strong>Multiple structural breaks</strong> — Bai, J., &amp; Perron, P. (2003). <em>Computation and analysis of multiple structural change models</em>. <strong>Journal of Applied Econometrics</strong>, 18(1), 1–22. <a href="https://onlinelibrary.wiley.com/doi/abs/10.1002/jae.659">Wiley abstract</a> / <a href="https://www.jstor.org/stable/30035185">JSTOR</a>.<br />
+<em>Context: provides statistical foundation for detecting and estimating breakpoints in regression models.</em></p>
+</li>
+<li>
+<p><strong>PELT algorithm</strong> — Killick, R., Fearnhead, P., &amp; Eckley, I. A. (2012). <em>Optimal Detection of Changepoints with a Linear Computational Cost</em>. <strong>Journal of the American Statistical Association</strong>, 107(500), 1590–1598. <a href="https://www.tandfonline.com/doi/abs/10.1080/01621459.2012.737745">Publisher</a> / <a href="https://arxiv.org/abs/1101.1438">preprint</a>.<br />
+<em>Context: efficient algorithm for change-point detection, used in the ruptures package.</em></p>
+</li>
+<li>
+<p><strong>ruptures package</strong> — Truong, C., Oudre, L., &amp; Vayatis, N. (2018/2020). <em>ruptures: change point detection in Python</em>. <strong>Journal of Statistical Software</strong>; also <em>Selective review of offline change point detection methods</em>, <strong>Signal Processing</strong>, 167, 107299. <a href="https://arxiv.org/abs/1801.00826">ruptures paper (arXiv)</a> • <a href="https://dl.acm.org/doi/10.1016/j.sigpro.2019.107299">review (Elsevier)</a> • <a href="https://centre-borelli.github.io/ruptures-docs/">project docs</a>.<br />
+<em>Context: the actual Python package used here for breakpoint detection.</em></p>
+</li>
+<li>
+<p><strong>Rolling-origin evaluation</strong> — Tashman, L. J. (2000). <em>Out-of-sample tests of forecasting accuracy: an analysis and review</em>. <strong>International Journal of Forecasting</strong>, 16(4), 437–450. <a href="https://www.sciencedirect.com/science/article/pii/S0169207000000650">ScienceDirect</a> / <a href="https://ideas.repec.org/a/eee/intfor/v16y2000i4p437-450.html">RePEc</a>.<br />
+<em>Context: justifies rolling-origin cross-validation used here to compare forecast models.</em></p>
+</li>
+<li>
+<p><strong>Exponential smoothing (origin)</strong> — Holt, C. C. (1957). <em>Forecasting seasonals and trends by exponentially weighted moving averages</em>. Office of Naval Research Report; reprinted <strong>International Journal of Forecasting</strong> (2004). <a href="https://www.sciencedirect.com/science/article/abs/pii/S0169207003001134">IJF reprint abstract</a>.<br />
+<em>Context: origin of exponential smoothing, one of our candidate forecasting models.</em></p>
+</li>
+<li>
+<p><strong>Holt–Winters seasonal method</strong> — Winters, P. R. (1960). <em>Forecasting sales by exponentially weighted moving averages</em>. <strong>Management Science</strong>, 6(3), 324–342. <a href="https://www.jstor.org/stable/2627346">JSTOR</a>.<br />
+<em>Context: extends Holt’s method with seasonality, used here in Holt–Winters model.</em></p>
+</li>
+<li>
+<p><strong>ARIMA framework</strong> — Box, G. E. P., &amp; Jenkins, G. M. (1970). <em>Time Series Analysis: Forecasting and Control</em>. Holden‑Day. (See later editions at Wiley; first edition archived: <a href="https://archive.org/details/timeseriesanalys0000boxg">Internet Archive</a>).<br />
+<em>Context: canonical reference for ARIMA/SARIMA models applied here.</em></p>
+</li>
+<li>
+<p><strong>Auto-ARIMA</strong> — Hyndman, R. J., &amp; Khandakar, Y. (2008). <em>Automatic time series forecasting: the forecast package for R</em>. <strong>Journal of Statistical Software</strong>, 27(3), 1–22. <a href="https://www.jstatsoft.org/v27/i03">JSS</a> / <a href="https://cran.r-project.org/web/packages/forecast/vignettes/JSS2008.pdf">PDF</a>.<br />
+<em>Context: describes automated ARIMA search; foundation for pmdarima implementation in Python.</em></p>
+</li>
+<li>
+<p><strong>Tipping points framing</strong> — Steffen, W., Rockström, J., Richardson, K., et al. (2018). <em>Trajectories of the Earth System in the Anthropocene</em>. <strong>Proceedings of the National Academy of Sciences</strong>, 115(33), 8252–8259. <a href="https://www.pnas.org/doi/10.1073/pnas.1810141115">PNAS</a> / <a href="https://www.pnas.org/doi/pdf/10.1073/pnas.1810141115">PDF</a>.<br />
+<em>Context: frames the idea of global and regional climate tipping points, motivating the broader application of this workflow.</em></p>
+</li>
+</ul>
+<hr />
+<h2 id="code">Code</h2>
+<blockquote>
+<p><strong>Note:</strong> Runtime can be slow, especially for the first run at a new location. This is due to network fetches and model optimization. Patience pays off with a robust result!</p>
+</blockquote>
+<pre><code class="language-python"># PRISM tipping-point forecast (VSI + scale/offset safe + month backoff)
+# GDAL compatibility for InvGeoTransform return shape
+from __future__ import annotations
+import warnings, datetime as dt
+from typing import Optional, Tuple, Dict, Union, List
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.dates import YearLocator, DateFormatter
+
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
+from statsmodels.tsa.statespace.sarimax import SARIMAX
+from statsmodels.tsa.forecasting.stl import STLForecast
+from statsmodels.tsa.arima.model import ARIMA
+
+from osgeo import gdal
+
+warnings.filterwarnings(&quot;ignore&quot;, category=UserWarning)
+
+# ---------- GDAL helpers ----------
+def _inv_geotransform(gt: Tuple[float, ...]) -&gt; Optional[Tuple[float, ...]]:
+    &quot;&quot;&quot;
+    Return inverted geotransform as a 6-tuple, handling both GDAL APIs:
+      - old: returns (success_flag, inv_gt)
+      - new: returns inv_gt
+    &quot;&quot;&quot;
+    try:
+        out = gdal.InvGeoTransform(gt)
+        # new API: a 6-tuple
+        if isinstance(out, (list, tuple)) and len(out) == 6:
+            return tuple(out)
+        # old API: (success, inv_gt)
+        if isinstance(out, (list, tuple)) and len(out) == 2:
+            ok, inv = out
+            return tuple(inv) if ok and isinstance(inv, (list, tuple)) and len(inv) == 6 else None
+    except Exception:
+        return None
+    return None
+
+# ---------- PRISM helpers (VSI) ----------
+_RES_CODE = {&quot;4km&quot;: &quot;25m&quot;, &quot;800m&quot;: &quot;30s&quot;, &quot;400m&quot;: &quot;15s&quot;}  # filename tokens
+
+def _as_datecode(date: Union[str, dt.date, dt.datetime], freq: str) -&gt; Tuple[str, str]:
+    &quot;&quot;&quot;Return (datecode, yyyy) for PRISM naming given freq ('daily'|'monthly'|'annual').&quot;&quot;&quot;
+    if isinstance(date, (dt.datetime, dt.date)):
+        d = date if isinstance(date, dt.date) and not isinstance(date, dt.datetime) else date.date()
+    elif isinstance(date, str):
+        s = date.strip()
+        if freq == &quot;daily&quot;:
+            try: d = dt.datetime.strptime(s, &quot;%Y-%m-%d&quot;).date()
+            except ValueError: d = dt.datetime.strptime(s, &quot;%Y%m%d&quot;).date()
+        elif freq == &quot;monthly&quot;:
+            try: d = dt.datetime.strptime(s, &quot;%Y-%m&quot;).date().replace(day=1)
+            except ValueError: d = dt.datetime.strptime(s, &quot;%Y%m&quot;).date().replace(day=1)
+        elif freq == &quot;annual&quot;:
+            d = dt.datetime.strptime(s, &quot;%Y&quot;).date().replace(month=1, day=1)
+        else:
+            raise ValueError(&quot;freq must be one of: 'daily','monthly','annual'&quot;)
+    else:
+        raise TypeError(&quot;date must be str, datetime, or date&quot;)
+
+    if freq == &quot;daily&quot;:
+        return d.strftime(&quot;%Y%m%d&quot;), d.strftime(&quot;%Y&quot;)
+    elif freq == &quot;monthly&quot;:
+        return d.strftime(&quot;%Y%m&quot;), d.strftime(&quot;%Y&quot;)
+    else:
+        return d.strftime(&quot;%Y&quot;), d.strftime(&quot;%Y&quot;)
+
+def _build_prism_vsi(
+    variable: str,
+    date: Union[str, dt.date, dt.datetime],
+    resolution: str = &quot;4km&quot;,
+    region: str = &quot;us&quot;,
+    freq: str = &quot;monthly&quot;,
+    network: str = &quot;an&quot;,
+) -&gt; str:
+    if resolution not in _RES_CODE:
+        raise ValueError(&quot;resolution must be one of {'800m','4km','400m'}&quot;)
+    datecode, yyyy = _as_datecode(date, freq)
+    res_code = _RES_CODE[resolution]
+    base_dir = f&quot;https://data.prism.oregonstate.edu/time_series/{region}/{network}/{resolution}/{variable}/{freq}/{yyyy}/&quot;
+    zip_name = f&quot;prism_{variable}_{region}_{res_code}_{datecode}.zip&quot;
+    tif_name = f&quot;prism_{variable}_{region}_{res_code}_{datecode}.tif&quot;
+    return f&quot;/vsizip//vsicurl/{base_dir}{zip_name}/{tif_name}&quot;
+
+def _gdal_open_vsi(vsi: str) -&gt; gdal.Dataset | None:
+    # Make vsicurl streaming robust
+    gdal.SetConfigOption(&quot;GDAL_DISABLE_READDIR_ON_OPEN&quot;, &quot;YES&quot;)
+    gdal.SetConfigOption(&quot;CPL_VSIL_CURL_ALLOWED_EXTENSIONS&quot;, &quot;.zip,.tif,.tiff,.xml,.stx,.prj,.aux.xml&quot;)
+    gdal.SetConfigOption(&quot;GDAL_HTTP_MULTIRANGE&quot;, &quot;YES&quot;)
+    gdal.SetConfigOption(&quot;CPL_VSIL_CURL_CHUNK_SIZE&quot;, &quot;1048576&quot;)  # 1 MB
+    return gdal.Open(vsi, gdal.GA_ReadOnly)
+
+def _safe_default_end_month(end: Optional[str]) -&gt; str:
+    &quot;&quot;&quot;Use previous full calendar month (YYYY-MM) if end is None.&quot;&quot;&quot;
+    if end is not None:
+        return end
+    today = pd.Timestamp.today().normalize()
+    return (today.replace(day=1) - pd.offsets.MonthBegin(1)).strftime(&quot;%Y-%m&quot;)
+
+def _read_point_scaled(ds: gdal.Dataset, lat: float, lon: float) -&gt; Optional[float]:
+    &quot;&quot;&quot;Read one pixel at (lat,lon), applying scale/offset; return °C or None.&quot;&quot;&quot;
+    gt = ds.GetGeoTransform()
+    inv_gt = _inv_geotransform(gt)
+    if inv_gt is None:
+        return None
+    px, py = gdal.ApplyGeoTransform(inv_gt, lon, lat)
+    pxi, pyi = int(round(px)), int(round(py))
+    if pxi &lt; 0 or pyi &lt; 0 or pxi &gt;= ds.RasterXSize or pyi &gt;= ds.RasterYSize:
+        return None
+    band = ds.GetRasterBand(1)
+    raw = float(band.ReadAsArray(pxi, pyi, 1, 1)[0, 0])
+    ndv = band.GetNoDataValue()
+    if ndv is not None and raw == ndv:
+        return None
+    scale = band.GetScale() if band.GetScale() is not None else 1.0
+    offset = band.GetOffset() if band.GetOffset() is not None else 0.0
+    val = raw * float(scale) + float(offset)
+    if not (-100.0 &lt;= val &lt;= 100.0):  # sanity AFTER scaling
+        return None
+    return val
+
+def _sample_prism_month(lat: float, lon: float, when: dt.date) -&gt; Optional[float]:
+    &quot;&quot;&quot;
+    Return **scaled** tmean (°C) at (lat,lon) for the target month.
+    If that month's file isn't published yet, step back up to 6 months.
+    &quot;&quot;&quot;
+    for back in range(0, 7):
+        ts_try = (pd.Timestamp(when) - pd.offsets.MonthBegin(back)).to_period(&quot;M&quot;).to_timestamp().date()
+        vsi = _build_prism_vsi(variable=&quot;tmean&quot;, date=ts_try, resolution=&quot;4km&quot;, region=&quot;us&quot;, freq=&quot;monthly&quot;, network=&quot;an&quot;)
+        ds = _gdal_open_vsi(vsi)
+        if ds is None:
+            continue
+        try:
+            val = _read_point_scaled(ds, lat, lon)
+            if val is not None:
+                return val
+        finally:
+            ds = None
+    return None
+
+def _stream_prism_monthly_tmean_vsi(lat: float, lon: float, start: Optional[str], end: Optional[str]) -&gt; pd.Series:
+    if start is None:
+        start = &quot;1981-01&quot;
+    end = _safe_default_end_month(end)
+
+    idx = pd.period_range(start=start, end=end, freq=&quot;M&quot;).to_timestamp(how=&quot;start&quot;)
+    vals, dates = [], []
+    for ts in idx:
+        val = _sample_prism_month(lat, lon, ts.date().replace(day=1))
+        if val is not None:
+            vals.append(val); dates.append(ts)
+
+    if not dates:
+        raise RuntimeError(&quot;No PRISM monthly samples could be read for the requested location/range.&quot;)
+    s = pd.Series(vals, index=pd.to_datetime(dates)).sort_index().asfreq(&quot;MS&quot;)
+    s = s.interpolate(limit=1)
+    s.name = &quot;tmean_c&quot;
+    return s
+
+# -------------------------
+# Optional geocoding
+# -------------------------
+def _geocode_place(place: str) -&gt; Tuple[float, float]:
+    try:
+        from geopy.geocoders import Nominatim
+    except Exception as e:
+        raise ImportError(&quot;geopy is required to geocode place names. Try: pip install geopy&quot;) from e
+    geolocator = Nominatim(user_agent=&quot;prism-forecast-geocoder&quot;)
+    loc = geolocator.geocode(place)
+    if not loc:
+        raise ValueError(f&quot;Could not geocode place: {place}&quot;)
+    return float(loc.latitude), float(loc.longitude)
+
+# -------------------------
+# Change-point detection (one break)
+# -------------------------
+def _detect_breakpoint(y: pd.Series) -&gt; Optional[pd.Timestamp]:
+    try:
+        import ruptures as rpt
+        arr = y.values.reshape(-1, 1)
+        algo = rpt.Pelt(model=&quot;rbf&quot;).fit(arr)
+        res = algo.predict(pen=8)
+        if len(res) &lt;= 1:
+            return None
+        idx = res[0] - 1
+        if 3 &lt;= idx &lt;= len(y) - 4:
+            return y.index[idx]
+        return None
+    except Exception:
+        window = max(12, len(y)//12)
+        if window*2 &gt;= len(y):
+            return None
+        x = np.arange(len(y))
+        def slope(a, b):
+            X = np.vstack([np.ones_like(a), a]).T
+            beta = np.linalg.lstsq(X, b, rcond=None)[0]
+            return beta[1]
+        best = None; best_jump = 0.0
+        for i in range(window, len(y)-window):
+            left = slope(x[i-window:i], y.values[i-window:i])
+            right = slope(x[i:i+window], y.values[i:i+window])
+            jump = abs(right - left)
+            if jump &gt; best_jump and 6 &lt; i &lt; len(y)-6:
+                best = i; best_jump = jump
+        return y.index[best] if best is not None else None
+
+# -------------------------
+# Rolling-origin backtest
+# -------------------------
+def _rolling_rmse(y: pd.Series, model_fn, steps=12, min_train=120):
+    y = y.dropna()
+    errs = []
+    for end in range(min_train, len(y)-steps+1, steps):
+        train = y.iloc[:end]
+        test = y.iloc[end:end+steps]
+        try:
+            fc = model_fn(train, horizon=len(test))
+            fc = fc.reindex(test.index)
+            errs.append(((fc - test)**2).mean()**0.5)
+        except Exception:
+            continue
+    return float(np.nanmean(errs)) if errs else np.inf
+
+# -------------------------
+# Candidate model wrappers
+# -------------------------
+def _fit_predict_es(train: pd.Series, horizon: int, return_pi=False):
+    mod = ExponentialSmoothing(train, trend=&quot;add&quot;, seasonal=&quot;add&quot;, seasonal_periods=12)
+    res = mod.fit(optimized=True, use_brute=True)
+    fc = res.forecast(horizon)
+    if return_pi:
+        resid = train - res.fittedvalues
+        std = float(np.nanstd(resid)); z = 1.64
+        lo = fc - z*std; hi = fc + z*std
+        return fc, lo, hi, {&quot;name&quot;: &quot;Holt-Winters (add-add)&quot;, &quot;aic&quot;: np.nan}
+    return fc
+
+def _fit_predict_stl_arima(train: pd.Series, horizon: int, return_pi=False):
+    stlf = STLForecast(endog=train, model=ARIMA, model_kwargs={&quot;order&quot;: (1,1,1)}, period=12, robust=True)
+    res = stlf.fit()
+    fc = res.forecast(horizon)
+    if return_pi:
+        resid = (train - res.fittedvalues).dropna()
+        std = float(np.nanstd(resid)); z = 1.64
+        lo = fc - z*std; hi = fc + z*std
+        return fc, lo, hi, {&quot;name&quot;: &quot;STL + ARIMA(1,1,1)&quot;, &quot;aic&quot;: np.nan}
+    return fc
+
+def _fit_predict_sarimax(train: pd.Series, horizon: int, return_pi=False):
+    best_res = None; best = (np.inf, None, None)
+    orders = [(1,1,0), (1,1,1), (2,1,1)]
+    sorders = [(0,1,1,12), (1,1,1,12)]
+    for order in orders:
+        for sorder in sorders:
+            try:
+                mod = SARIMAX(train, order=order, seasonal_order=sorder, enforce_stationarity=False, enforce_invertibility=False)
+                res = mod.fit(disp=False)
+                if res.aic &lt; best[0]:
+                    best = (res.aic, order, sorder); best_res = res
+            except Exception:
+                continue
+    if best_res is None:
+        mod = SARIMAX(train, order=(1,1,1), seasonal_order=(0,1,1,12), enforce_stationarity=False, enforce_invertibility=False)
+        best_res = mod.fit(disp=False); label = &quot;SARIMAX fallback&quot;
+    else:
+        aic, order, sorder = best; label = f&quot;SARIMAX {order} x {sorder}&quot;
+    fc_res = best_res.get_forecast(steps=horizon)
+    fc = fc_res.predicted_mean
+    if return_pi:
+        conf = fc_res.conf_int(alpha=0.10)
+        lo = conf.iloc[:,0]; hi = conf.iloc[:,1]
+        return fc, lo, hi, {&quot;name&quot;: label, &quot;aic&quot;: float(best_res.aic)}
+    return fc
+
+def _fit_predict_pmdarima(train: pd.Series, horizon: int, return_pi=False):
+    try:
+        import pmdarima as pm
+    except Exception:
+        if return_pi:
+            raise
+        return _fit_predict_sarimax(train, horizon, return_pi=return_pi)
+    model = pm.auto_arima(
+        train, seasonal=True, m=12, information_criterion=&quot;aic&quot;, stepwise=True,
+        suppress_warnings=True, error_action=&quot;ignore&quot;, max_p=3, max_q=3, max_P=2, max_Q=2, d=None, D=None
+    )
+    fc_idx = pd.date_range(train.index[-1] + pd.offsets.MonthBegin(1), periods=horizon, freq=&quot;MS&quot;)
+    fc = pd.Series(model.predict(n_periods=horizon), index=fc_idx)
+    if return_pi:
+        vals, conf = model.predict(n_periods=horizon, return_conf_int=True, alpha=0.10)
+        lo = pd.Series(conf[:,0], index=fc_idx); hi = pd.Series(conf[:,1], index=fc_idx)
+        return fc, lo, hi, {&quot;name&quot;: &quot;auto_arima (pmdarima)&quot;, &quot;aic&quot;: float(model.aic())}
+    return fc
+
+# -------------------------
+# Main function
+# -------------------------
+def plot_prism_tipping_point_forecast(
+    place: Optional[str] = None,
+    lat: Optional[float] = None,
+    lon: Optional[float] = None,
+    start: Optional[str] = &quot;1981-01&quot;,
+    end: Optional[str] = None,
+    max_forecast_years: int = 20,
+    figsize: Tuple[int, int] = (11, 6),
+    detect_break: bool = True,
+    prefer_pmdarima: bool = True,
+    seed: int = 1337,
+) -&gt; Tuple[plt.Figure, Dict, pd.Series]:
+    &quot;&quot;&quot;Stream PRISM monthly tmean (°C) via GDAL VSI, detect break, and forecast. Returns (fig, model_info, series).&quot;&quot;&quot;
+    np.random.seed(seed)
+
+    if place is None and (lat is None or lon is None):
+        raise ValueError(&quot;Provide either a place name OR both lat and lon.&quot;)
+    if place is not None and (lat is None or lon is None):
+        lat, lon = _geocode_place(place)
+
+    y = _stream_prism_monthly_tmean_vsi(lat, lon, start, end)
+    if len(y) &lt; 60:
+        raise ValueError(&quot;Need at least ~5 years of monthly data for stable forecasting.&quot;)
+
+    bp_ts = _detect_breakpoint(y) if detect_break else None
+
+    def es_fn(train, horizon): return _fit_predict_es(train, horizon)
+    def stl_fn(train, horizon): return _fit_predict_stl_arima(train, horizon)
+    def sarimax_fn(train, horizon): return _fit_predict_sarimax(train, horizon)
+
+    cands = [(&quot;Holt-Winters&quot;, es_fn), (&quot;STL+ARIMA&quot;, stl_fn), (&quot;SARIMAX&quot;, sarimax_fn)]
+    if prefer_pmdarima:
+        try:
+            def pmd_fn(train, horizon): return _fit_predict_pmdarima(train, horizon)
+            cands.insert(0, (&quot;auto_arima&quot;, pmd_fn))
+        except Exception:
+            pass
+
+    scores = []
+    for name, fn in cands:
+        rmse = _rolling_rmse(y, fn, steps=12, min_train=min(120, max(72, len(y)//2)))
+        scores.append((rmse, name, fn))
+    scores.sort(key=lambda x: x[0])
+    best_rmse, best_name, best_fn = scores[0]
+
+    horizon = int(max_forecast_years * 12)
+    if best_name == &quot;Holt-Winters&quot;:
+        fc, lo, hi, info = _fit_predict_es(y, horizon, return_pi=True)
+    elif best_name == &quot;STL+ARIMA&quot;:
+        fc, lo, hi, info = _fit_predict_stl_arima(y, horizon, return_pi=True)
+    elif best_name == &quot;SARIMAX&quot;:
+        fc, lo, hi, info = _fit_predict_sarimax(y, horizon, return_pi=True)
+    else:
+        try:
+            fc, lo, hi, info = _fit_predict_pmdarima(y, horizon, return_pi=True)
+        except Exception:
+            fc, lo, hi, info = _fit_predict_sarimax(y, horizon, return_pi=True)
+            best_name = &quot;SARIMAX (fallback)&quot;
+
+    model_info = {&quot;winner&quot;: best_name, &quot;rmse_validation&quot;: best_rmse}
+    model_info.update(info)
+
+    # Plotting
+    C_OBS = &quot;#1f77b4&quot;; C_BREAK = &quot;#d62728&quot;; C_FC = &quot;#2ca02c&quot;; C_PI = &quot;#a6dba0&quot;
+    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    ax.plot(y.index, y.values, color=C_OBS, lw=1.8, label=&quot;Observed&quot;)
+    if bp_ts is not None and bp_ts in y.index:
+        ax.axvline(bp_ts, color=C_BREAK, lw=1.5, ls=&quot;--&quot;)
+        ax.text(bp_ts, ax.get_ylim()[1], &quot;  break&quot;, color=C_BREAK, va=&quot;top&quot;, ha=&quot;left&quot;)
+    ax.fill_between(fc.index, lo.values, hi.values, color=C_PI, alpha=0.35, label=&quot;90% PI&quot;)
+    ax.plot(fc.index, fc.values, color=C_FC, lw=2.0, label=&quot;Forecast&quot;)
+
+    ax.set_ylabel(&quot;Monthly mean temperature (°C)&quot;)
+    ax.set_xlabel(&quot;Year&quot;)
+    ax.xaxis.set_major_locator(YearLocator(base=5))
+    ax.xaxis.set_major_formatter(DateFormatter(&quot;%Y&quot;))
+    ax.grid(True, axis=&quot;y&quot;, alpha=0.15)
+
+    title_loc = place if place is not None else f&quot;{lat:.4f}, {lon:.4f}&quot;
+    start_str = y.index.min().strftime(&quot;%Y-%m&quot;); end_str = y.index.max().strftime(&quot;%Y-%m&quot;)
+    ax.set_title(f&quot;PRISM tmean at {title_loc}&quot;)
+    subtitle = f&quot;Data: {start_str} to {end_str}  •  Break: {bp_ts.date() if bp_ts is not None else 'none'}  •  Model: {model_info['winner']}&quot;
+    ax.text(0.01, 1.02, subtitle, transform=ax.transAxes, ha=&quot;left&quot;, va=&quot;bottom&quot;, fontsize=9, alpha=0.9)
+
+    ax.legend(frameon=False, ncol=3, loc=&quot;upper left&quot;)
+    ax.margins(x=0.01)
+
+    plt.show(fig)
+    return fig, model_info, y
+
+# Example:
+fig, info, series = plot_prism_tipping_point_forecast(place=&quot;Boulder, CO&quot;, start=&quot;1981-01&quot;, max_forecast_years=20)
+</code></pre>
+<pre><code class="language-r"># PRISM tipping-point forecast in R (VSI + month backoff + scale/offset safe)
+# ---------------------------------------------------------------------------
+# Suggested mamba installs (terminal):
+#   mamba install -c conda-forge r-terra r-ggplot2 r-lubridate r-dplyr r-tidyr r-forecast r-scales
+# Optional:
+#   mamba install -c conda-forge r-strucchange        # breakpoints (preferred)
+#   mamba install -c conda-forge r-changepoint        # alternative break detector
+#   mamba install -c conda-forge r-tidygeocoder       # place=&quot;City, ST&quot; support
+
+suppressPackageStartupMessages({
+  library(terra)
+  library(ggplot2)
+  library(lubridate)
+  library(dplyr)
+  library(tidyr)
+  library(forecast)
+  library(scales)
+})
+
+# ---------- PRISM helpers (VSI) ----------
+.res_code &lt;- c(&quot;4km&quot;=&quot;25m&quot;,&quot;800m&quot;=&quot;30s&quot;,&quot;400m&quot;=&quot;15s&quot;)
+
+.as_datecode &lt;- function(date, freq=c(&quot;monthly&quot;,&quot;daily&quot;,&quot;annual&quot;)){
+  freq &lt;- match.arg(freq)
+  if (inherits(date, c(&quot;Date&quot;,&quot;POSIXt&quot;))) {
+    d &lt;- as.Date(date)
+  } else if (is.character(date)) {
+    s &lt;- trimws(date)
+    if (freq==&quot;daily&quot;){
+      if (grepl(&quot;^\\d{4}-\\d{2}-\\d{2}$&quot;, s)) d &lt;- as.Date(s)
+      else d &lt;- as.Date(s, format=&quot;%Y%m%d&quot;)
+    } else if (freq==&quot;monthly&quot;){
+      if (grepl(&quot;^\\d{4}-\\d{2}$&quot;, s)) d &lt;- as.Date(paste0(s,&quot;-01&quot;))
+      else d &lt;- as.Date(paste0(s,&quot;01&quot;), format=&quot;%Y%m%d&quot;)
+    } else {
+      d &lt;- as.Date(paste0(s,&quot;-01-01&quot;))
+    }
+  } else stop(&quot;date must be character or Date/POSIXt&quot;)
+
+  if (freq==&quot;daily&quot;) list(datecode=format(d,&quot;%Y%m%d&quot;), yyyy=format(d,&quot;%Y&quot;))
+  else if (freq==&quot;monthly&quot;) list(datecode=format(d,&quot;%Y%m&quot;), yyyy=format(d,&quot;%Y&quot;))
+  else list(datecode=format(d,&quot;%Y&quot;), yyyy=format(d,&quot;%Y&quot;))
+}
+
+build_prism_vsi &lt;- function(variable=&quot;tmean&quot;,
+                            date=&quot;2025-06&quot;,
+                            resolution=&quot;4km&quot;,
+                            region=&quot;us&quot;,
+                            freq=&quot;monthly&quot;,
+                            network=&quot;an&quot;){
+  if (!resolution %in% names(.res_code)) stop(&quot;resolution must be one of {'800m','4km','400m'}&quot;)
+  dc &lt;- .as_datecode(date, freq=freq)
+  res_token &lt;- unname(.res_code[[resolution]])
+  base_dir &lt;- sprintf(&quot;https://data.prism.oregonstate.edu/time_series/%s/%s/%s/%s/%s/%s/&quot;,
+                      region, network, resolution, variable, freq, dc$yyyy)
+  zip_name &lt;- sprintf(&quot;prism_%s_%s_%s_%s.zip&quot;, variable, region, res_token, dc$datecode)
+  tif_name &lt;- sprintf(&quot;prism_%s_%s_%s_%s.tif&quot;,  variable, region, res_token, dc$datecode)
+  sprintf(&quot;/vsizip//vsicurl/%s%s/%s&quot;, base_dir, zip_name, tif_name)
+}
+
+safe_default_end_month &lt;- function(end=NULL){
+  if (!is.null(end)) return(end)
+  today &lt;- floor_date(Sys.Date(), &quot;month&quot;)
+  format(today - months(1), &quot;%Y-%m&quot;)
+}
+
+# Scale/offset helper:
+apply_scale_sanity &lt;- function(x){
+  if (all(is.na(x))) return(NA_real_)
+  v &lt;- as.numeric(x)[1]
+  if (is.na(v)) return(NA_real_)
+  # If values look like degC*10, normalize
+  if (abs(v) &gt; 120) v &lt;- v / 10.0
+  # sanity bound
+  if (v &lt; -100 || v &gt; 100) return(NA_real_)
+  v
+}
+
+sample_prism_month &lt;- function(lat, lon, when, max_back=6L){
+  # Try target month, then step back up to max_back months
+  for (b in 0:max_back){
+    ts_try &lt;- as.Date(floor_date(as.Date(when), &quot;month&quot;) - months(b))
+    vsi &lt;- build_prism_vsi(variable=&quot;tmean&quot;, date=ts_try, resolution=&quot;4km&quot;,
+                           region=&quot;us&quot;, freq=&quot;monthly&quot;, network=&quot;an&quot;)
+    r &lt;- tryCatch(terra::rast(vsi), error=function(e) NULL)
+    if (is.null(r)) next
+    val &lt;- tryCatch({
+      extract(r, matrix(c(lon, lat), ncol=2))[,2, drop=TRUE]
+    }, error=function(e) NA_real_)
+    val &lt;- apply_scale_sanity(val)
+    if (!is.na(val)) return(val)
+  }
+  return(NA_real_)
+}
+
+fill_single_gaps &lt;- function(x){
+  # Only fill isolated NA flanked by numbers; leave longer runs as NA
+  if (length(x) &lt; 3) return(x)
+  y &lt;- x
+  for (i in 2:(length(x)-1)){
+    if (is.na(x[i]) &amp;&amp; !is.na(x[i-1]) &amp;&amp; !is.na(x[i+1])){
+      y[i] &lt;- 0.5*(x[i-1]+x[i+1])
+    }
+  }
+  y
+}
+
+stream_prism_monthly_tmean &lt;- function(lat, lon, start=&quot;1981-01&quot;, end=NULL){
+  end &lt;- safe_default_end_month(end)
+  idx &lt;- seq(from=as.Date(paste0(start,&quot;-01&quot;)),
+             to=as.Date(paste0(end,&quot;-01&quot;)),
+             by=&quot;1 month&quot;)
+  vals &lt;- vapply(idx, function(d) sample_prism_month(lat, lon, d), numeric(1))
+  keep &lt;- !is.na(vals)
+  if (!any(keep)) stop(&quot;No PRISM monthly samples could be read for the requested location/range.&quot;)
+  df &lt;- tibble::tibble(date=idx, tmean_c=vals)
+  df$tmean_c &lt;- fill_single_gaps(df$tmean_c)
+  df %&gt;% filter(!is.na(tmean_c)) %&gt;% arrange(date)
+}
+
+# ---------- Optional geocoding ----------
+# If tidygeocoder is installed, use it; else try a tiny built-in lookup; else stop.
+.geocode_builtin &lt;- tibble::tibble(
+  place = c(&quot;Boulder, CO&quot;,&quot;Denver, CO&quot;,&quot;Phoenix, AZ&quot;,&quot;Seattle, WA&quot;,&quot;New York, NY&quot;,&quot;Los Angeles, CA&quot;),
+  lat   = c(40.0150, 39.7392, 33.4484, 47.6062, 40.7128, 34.0522),
+  lon   = c(-105.2705,-104.9903,-112.0740,-122.3321,-74.0060,-118.2437)
+)
+
+geocode_place &lt;- function(place){
+  if (requireNamespace(&quot;tidygeocoder&quot;, quietly=TRUE)){
+    res &lt;- tidygeocoder::geocode(address=place, method=&quot;osm&quot;, quiet=TRUE)
+    if (nrow(res)&gt;0 &amp;&amp; !is.na(res$lat[1]) &amp;&amp; !is.na(res$long[1])) {
+      return(c(lat=res$lat[1], lon=res$long[1]))
+    }
+  }
+  hit &lt;- .geocode_builtin %&gt;% filter(tolower(place)==tolower(.data$place))
+  if (nrow(hit)==1) return(c(lat=hit$lat, lon=hit$lon))
+  stop(&quot;Geocoding failed; install 'tidygeocoder' (or add to built-in lookup) or pass lat/lon.&quot;)
+}
+
+# ---------- Change-point detection (one break) ----------
+# Strategy: try strucchange -&gt; changepoint -&gt; OLS fallback
+
+detect_breakpoint &lt;- function(df_monthly){
+  y &lt;- df_monthly$tmean_c
+  t &lt;- seq_along(y)
+
+  # 1) strucchange (slope break in linear trend)
+  if (requireNamespace(&quot;strucchange&quot;, quietly=TRUE)){
+    dat &lt;- data.frame(y=y, t=t)
+    bp &lt;- tryCatch(strucchange::breakpoints(y ~ t, data=dat, h=max(12, floor(length(y)/12))),
+                   error=function(e) NULL)
+    k &lt;- if (!is.null(bp) &amp;&amp; length(bp$breakpoints)&gt;0) bp$breakpoints[1] else NA_integer_
+    if (!is.na(k) &amp;&amp; k &gt;= 6 &amp;&amp; k &lt;= (length(y)-6)) return(df_monthly$date[k])
+  }
+
+  # 2) changepoint (mean/var break)
+  if (requireNamespace(&quot;changepoint&quot;, quietly=TRUE)){
+    cp &lt;- tryCatch(changepoint::cpt.meanvar(y, method=&quot;PELT&quot;, penalty=&quot;SIC&quot;),
+                   error=function(e) NULL)
+    k &lt;- if (!is.null(cp) &amp;&amp; length(changepoint::cpts(cp))&gt;0) changepoint::cpts(cp)[1] else NA_integer_
+    if (!is.na(k) &amp;&amp; k &gt;= 6 &amp;&amp; k &lt;= (length(y)-6)) return(df_monthly$date[k])
+  }
+
+  # 3) OLS segmented fallback: pick k minimizing RSS with two lines
+  ols_line &lt;- function(x, y){
+    X &lt;- cbind(1, x)
+    coef &lt;- tryCatch(solve(t(X)%*%X, t(X)%*%y), error=function(e) c(NA,NA))
+    yhat &lt;- as.vector(X%*%coef)
+    rss &lt;- sum((y-yhat)^2)
+    list(a=coef[1], b=coef[2], rss=rss)
+  }
+  n &lt;- length(y)
+  window &lt;- max(12, floor(n/12))
+  best_k &lt;- NA; best_rss &lt;- Inf
+  for (k in seq(window, n-window)){
+    left  &lt;- ols_line(t[1:k], y[1:k])$rss
+    right &lt;- ols_line(t[(k+1):n], y[(k+1):n])$rss
+    tot &lt;- left + right
+    if (!is.na(tot) &amp;&amp; tot &lt; best_rss){ best_rss &lt;- tot; best_k &lt;- k }
+  }
+  if (is.na(best_k) || best_k &lt; 6 || best_k &gt; (n-6)) return(NULL)
+  df_monthly$date[best_k]
+}
+
+# ---------- Rolling-origin backtest ----------
+rolling_rmse &lt;- function(ts_y, fit_fn, steps=12, min_train=120){
+  n &lt;- length(ts_y)
+  errs &lt;- c()
+  for (end in seq(min_train, n-steps, by=steps)){
+    train &lt;- ts_y[1:end]
+    test  &lt;- ts_y[(end+1):(end+steps)]
+    fc &lt;- tryCatch(fit_fn(train, horizon=length(test)), error=function(e) rep(NA_real_, length(test)))
+    if (length(fc) == length(test) &amp;&amp; all(!is.na(fc))) {
+      errs &lt;- c(errs, sqrt(mean((fc - test)^2)))
+    }
+  }
+  if (length(errs)==0) Inf else mean(errs)
+}
+
+# ---------- Candidate model wrappers ----------
+fit_predict_ets &lt;- function(train, horizon, return_pi=FALSE){
+  m &lt;- forecast::ets(train, model=&quot;AAA&quot;)
+  fc &lt;- forecast::forecast(m, h=horizon, level=90)
+  if (return_pi) list(mean=as.numeric(fc$mean), lo=as.numeric(fc$lower[,1]), hi=as.numeric(fc$upper[,1]),
+                      label=&quot;ETS(A,A,A)&quot;, aic=AIC(m))
+  else as.numeric(fc$mean)
+}
+
+fit_predict_stl_arima &lt;- function(train, horizon, return_pi=FALSE){
+  m &lt;- forecast::stlm(train, method=&quot;arima&quot;)
+  fc &lt;- forecast::forecast(m, h=horizon, level=90)
+  if (return_pi) list(mean=as.numeric(fc$mean), lo=as.numeric(fc$lower[,1]), hi=as.numeric(fc$upper[,1]),
+                      label=&quot;STL + ARIMA&quot;, aic=NA_real_)
+  else as.numeric(fc$mean)
+}
+
+fit_predict_auto_arima &lt;- function(train, horizon, return_pi=FALSE){
+  m &lt;- forecast::auto.arima(train, seasonal=TRUE, stepwise=TRUE, approximation=FALSE)
+  fc &lt;- forecast::forecast(m, h=horizon, level=90)
+  if (return_pi) list(mean=as.numeric(fc$mean), lo=as.numeric(fc$lower[,1]), hi=as.numeric(fc$upper[,1]),
+                      label=sprintf(&quot;auto.arima %s&quot;, paste(forecast::arimaorder(m), collapse=&quot;,&quot;)),
+                      aic=AIC(m))
+  else as.numeric(fc$mean)
+}
+
+# ---------- Main function ----------
+plot_prism_tipping_point_forecast &lt;- function(place=NULL,
+                                              lat=NULL, lon=NULL,
+                                              start=&quot;1981-01&quot;,
+                                              end=NULL,
+                                              max_forecast_years=20,
+                                              detect_break=TRUE,
+                                              seed=1337){
+  set.seed(seed)
+  if (is.null(place) &amp;&amp; (is.null(lat) || is.null(lon)))
+    stop(&quot;Provide either a place name OR both lat and lon.&quot;)
+  if (!is.null(place) &amp;&amp; (is.null(lat) || is.null(lon))){
+    coords &lt;- tryCatch(geocode_place(place), error=function(e) NULL)
+    if (is.null(coords)) stop(&quot;Geocoding failed; install 'tidygeocoder' (or add to built-in lookup) or pass lat/lon.&quot;)
+    lat &lt;- coords[&quot;lat&quot;]; lon &lt;- coords[&quot;lon&quot;]
+  }
+
+  df &lt;- stream_prism_monthly_tmean(lat, lon, start=start, end=end)
+  if (nrow(df) &lt; 60) stop(&quot;Need at least ~5 years of monthly data for stable forecasting.&quot;)
+
+  # Break detection
+  bp_date &lt;- if (detect_break) detect_breakpoint(df) else NULL
+
+  # Monthly ts (freq=12)
+  y_ts &lt;- ts(df$tmean_c, start=c(year(min(df$date)), month(min(df$date))), frequency=12)
+
+  # Candidates
+  fitA &lt;- function(z, horizon) fit_predict_auto_arima(z, horizon)
+  fitB &lt;- function(z, horizon) fit_predict_stl_arima(z, horizon)
+  fitC &lt;- function(z, horizon) fit_predict_ets(z, horizon)
+
+  base_min_train &lt;- min(120, max(72, floor(length(y_ts)/2)))
+  rmseA &lt;- rolling_rmse(y_ts, fitA, steps=12, min_train=base_min_train)
+  rmseB &lt;- rolling_rmse(y_ts, fitB, steps=12, min_train=base_min_train)
+  rmseC &lt;- rolling_rmse(y_ts, fitC, steps=12, min_train=base_min_train)
+
+  scores &lt;- tibble::tibble(model=c(&quot;auto.arima&quot;,&quot;STL+ARIMA&quot;,&quot;ETS&quot;),
+                           rmse=c(rmseA, rmseB, rmseC))
+  winner &lt;- scores$model[which.min(scores$rmse)]
+
+  horizon &lt;- max_forecast_years * 12
+  if (winner==&quot;ETS&quot;){
+    res &lt;- fit_predict_ets(y_ts, horizon, return_pi=TRUE)
+  } else if (winner==&quot;STL+ARIMA&quot;){
+    res &lt;- fit_predict_stl_arima(y_ts, horizon, return_pi=TRUE)
+  } else {
+    res &lt;- fit_predict_auto_arima(y_ts, horizon, return_pi=TRUE)
+  }
+
+  # Build forecast df with dates
+  last_month &lt;- max(df$date)
+  fidx &lt;- seq(from=last_month %m+% months(1), by=&quot;1 month&quot;, length.out=horizon)
+  fc_df &lt;- tibble::tibble(date=fidx, mean=res$mean, lo=res$lo, hi=res$hi)
+
+  # Plot
+  C_OBS &lt;- &quot;#1f77b4&quot;; C_BREAK &lt;- &quot;#d62728&quot;; C_FC &lt;- &quot;#2ca02c&quot;; C_PI &lt;- &quot;#a6dba0&quot;
+
+  p &lt;- ggplot() +
+    geom_line(data=df, aes(date, tmean_c), color=C_OBS, linewidth=0.7) +
+    { if (!is.null(bp_date)) geom_vline(xintercept=as.numeric(bp_date), color=C_BREAK, linetype=&quot;dashed&quot;) } +
+    geom_ribbon(data=fc_df, aes(date, ymin=lo, ymax=hi), fill=C_PI, alpha=0.35) +
+    geom_line(data=fc_df, aes(date, mean), color=C_FC, linewidth=0.8) +
+    scale_x_date(date_breaks = &quot;5 years&quot;, date_labels = &quot;%Y&quot;, expand=expansion(mult=c(0.01,0.02))) +
+    labs(x=&quot;Year&quot;, y=&quot;Monthly mean temperature (°C)&quot;,
+         title = sprintf(&quot;PRISM tmean at %s&quot;,
+                         if (!is.null(place)) place else sprintf(&quot;%.4f, %.4f&quot;, lat, lon)),
+         subtitle = sprintf(&quot;Data: %s to %s  •  Break: %s  •  Model: %s  •  RMSE (val): %s&quot;,
+                            format(min(df$date), &quot;%Y-%m&quot;),
+                            format(max(df$date), &quot;%Y-%m&quot;),
+                            if (!is.null(bp_date)) format(bp_date, &quot;%Y-%m&quot;) else &quot;none&quot;,
+                            winner, scales::comma(min(scores$rmse)))) +
+    theme_minimal(base_size = 11) +
+    theme(panel.grid.minor = element_blank())
+
+  print(p)
+
+  list(plot=p,
+       model_info=list(winner=winner, rmse_validation=min(scores$rmse), label=winner),
+       series=df)
+}
+
+# ----------------------------
+# Examples:
+# ----------------------------
+
+# 1) With coordinates (no extra installs):
+out &lt;- plot_prism_tipping_point_forecast(
+   lat = 40.015, lon = -105.2705,   # Boulder, CO
+   start = &quot;1981-01&quot;,
+   max_forecast_years = 20
+ )
+
+# 2) With place name (install tidygeocoder first, or rely on built-in few-city lookup):
+# out &lt;- plot_prism_tipping_point_forecast(
+#   place = &quot;Boulder, CO&quot;,
+#   start = &quot;1981-01&quot;,
+#   max_forecast_years = 20
+# )
+</code></pre>
+
+
+
+
+
+
+
+  
+    
+  
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
+    </span>
+    2025-09-16
+  </span>
+
+    
+    
+    
+    
+  </aside>
+
+
+  
+
+
+
+  <form class="md-feedback" name="feedback" hidden>
+    <fieldset>
+      <legend class="md-feedback__title">
+        Was this page helpful?
+      </legend>
+      <div class="md-feedback__inner">
+        <div class="md-feedback__list">
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="This page was helpful" data-md-value="1">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 9v12H1V9zm4 12a2 2 0 0 1-2-2V9c0-.55.22-1.05.59-1.41L14.17 1l1.06 1.06c.27.27.44.64.44 1.05l-.03.32L14.69 8H21a2 2 0 0 1 2 2v2c0 .26-.05.5-.14.73l-3.02 7.05C19.54 20.5 18.83 21 18 21zm0-2h9.03L21 12v-2h-8.79l1.13-5.32L9 9.03z"/></svg>
+            </button>
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="This page could be improved" data-md-value="-1">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 15V3h4v12zM15 3a2 2 0 0 1 2 2v10c0 .55-.22 1.05-.59 1.41L9.83 23l-1.06-1.06c-.27-.27-.44-.64-.44-1.06l.03-.31.95-4.57H3a2 2 0 0 1-2-2v-2c0-.26.05-.5.14-.73l3.02-7.05C4.46 3.5 5.17 3 6 3zm0 2H5.97L3 12v2h8.78l-1.13 5.32L15 14.97z"/></svg>
+            </button>
+          
+        </div>
+        <div class="md-feedback__note">
+          
+            <div data-md-value="1" hidden>
+              
+              
+                
+              
+              
+              
+                
+                
+              
+              Thanks for your feedback!
+            </div>
+          
+            <div data-md-value="-1" hidden>
+              
+              
+                
+              
+              
+              
+                
+                
+              
+              Thanks for your feedback! Help us improve this page by using our <a href="..." target="_blank" rel="noopener">feedback form</a>.  
+            </div>
+          
+        </div>
+      </div>
+    </fieldset>
+  </form>
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2023 University of Colorado Boulder
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/cu-esiil/" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "navigation.instant", "navigation.tracking", "navigation.indexes", "navigation.top", "toc.integrate", "toc.follow", "content.code.copy"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+    
+  </body>
+</html>

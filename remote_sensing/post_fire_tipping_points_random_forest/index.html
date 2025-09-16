@@ -1,0 +1,1548 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Analysis Modules for Environmental Data Science">
+      
+      
+        <meta name="author" content="ESIIL CI team (lead = Ty Tuff)">
+      
+      
+        <link rel="canonical" href="https://cu-esiil.github.io/analytics-library/remote_sensing/post_fire_tipping_points_random_forest/">
+      
+      
+      
+      
+      <link rel="icon" href="../../favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.20">
+    
+    
+      
+        <title>Burning Boundaries: Random Forest Early Warnings for Post-Fire Collapse - ESIIL Analytics Library</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.e53b48f4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Open Sans";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-KPW08MT0F2"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-KPW08MT0F2",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-KPW08MT0F2",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#burning-boundaries-random-forest-early-warnings-for-post-fire-collapse" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="https://cu-esiil.github.io/home/" title="ESIIL Analytics Library" class="md-header__button md-logo" aria-label="ESIIL Analytics Library" data-md-component="logo">
+      
+  <img src="https://raw.githubusercontent.com/CU-ESIIL/data-library/main/docs/assets/esiil_oasis_logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            ESIIL Analytics Library
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Burning Boundaries: Random Forest Early Warnings for Post-Fire Collapse
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: white)" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/cu-esiil/analytics-library" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    analytics-library
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://cu-esiil.github.io/home/" title="ESIIL Analytics Library" class="md-nav__button md-logo" aria-label="ESIIL Analytics Library" data-md-component="logo">
+      
+  <img src="https://raw.githubusercontent.com/CU-ESIIL/data-library/main/docs/assets/esiil_oasis_logo.png" alt="logo">
+
+    </a>
+    ESIIL Analytics Library
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/cu-esiil/analytics-library" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    analytics-library
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../innovation-summit-2025/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Innovation Summit 2025
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Topics
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Topics
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../topic/forecasting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    forecasting
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../topic/time-series/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    time-series
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tags/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tags
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://cu-esiil.github.io/how_to_contribute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    How to Contribute
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="burning-boundaries-random-forest-early-warnings-for-post-fire-collapse">Burning Boundaries: Random Forest Early Warnings for Post-Fire Collapse</h1>
+<p><img alt="Random Forest NDVI Fire" src="images/random_forest_nvdi_fire.png" /></p>
+<h2 id="introduction">Introduction</h2>
+<p>Wildfires can push ecosystems across <strong>tipping points</strong>—for example, from forests to shrublands—when vegetation fails to recover after disturbance. This analytics entry describes a reproducible workflow that:</p>
+<ul>
+<li>Aligns <strong>fire events</strong> (from the FIRED database) with <strong>satellite vegetation time series</strong> (Sentinel‑2 NDVI);</li>
+<li>Extracts <strong>early‑warning signals (EWS)</strong> from those time series; and</li>
+<li>Trains a <strong>Random Forest (RF)</strong> classifier to flag pixels that show <strong>persistent post‑fire vegetation collapse</strong>.</li>
+</ul>
+<p>The approach integrates three research strands: fire event mapping (FIRED), critical‑transition theory (EWS), and remote‑sensing machine learning.</p>
+<h2 id="data-sources">Data Sources</h2>
+<p><strong>Fire Events: FIRED (Fire Events Data)</strong></p>
+<ul>
+<li>Source: Andela et al. (2019, <em>Nature Ecology &amp; Evolution</em>); Balch et al. (2020, CU Scholar dataset).</li>
+<li>Content: Event‑level and daily polygons delineating individual wildfires globally.</li>
+<li>Usage here: Event polygons for CONUS + Alaska, including ignition date (<code>ig_date</code>) and fire perimeter geometry.</li>
+<li>Format: GeoPackage or Shapefile; read into a GeoDataFrame (EPSG:4326).</li>
+</ul>
+<p><strong>Vegetation Time Series: Sentinel‑2 Level‑2A NDVI</strong></p>
+<ul>
+<li>Coverage: Mid‑2015 to present.</li>
+<li>Resolution: 10 m (red and near‑infrared bands).</li>
+<li>Access: SpatioTemporal Asset Catalog (STAC) APIs (e.g., Earth‑Search by Element84).</li>
+<li>Representation in code: 3‑D array <code>(time, height, width)</code> containing NDVI values.</li>
+</ul>
+<blockquote>
+<p>Optional: Other indices (e.g., Enhanced Vegetation Index, Normalized Burn Ratio) and other sensors (e.g., Landsat, PlanetScope) can be incorporated similarly.</p>
+</blockquote>
+<h2 id="why-this-matters">Why This Matters</h2>
+<ul>
+<li><strong>Ecological resilience</strong>: Provides evidence on whether ecosystems exhibit critical transitions after fire.</li>
+<li><strong>Management &amp; restoration</strong>: Identifies high‑risk areas where recovery is unlikely without intervention.</li>
+<li><strong>Theory into practice</strong>: Tests whether statistical early‑warning indicators (e.g., variance, autocorrelation, trend) can predict persistent vegetation collapse.</li>
+</ul>
+<h2 id="workflow-stepbystep">Workflow (Step‑by‑Step)</h2>
+<ol>
+<li><strong>Select fires</strong> from FIRED (e.g., <code>ig_year &gt;= 2018</code>, <code>tot_ar_km2 &gt; 10</code>).</li>
+<li><strong>Build time windows</strong> around ignition date: <code>pre_days</code> (e.g., 120) before ignition, <code>post_days</code> (e.g., 180) after ignition, split into rolling windows (<code>window_days</code>, <code>step_days</code>).</li>
+<li><strong>Fetch NDVI stacks</strong> from Sentinel‑2 via STAC for each window and the fire’s bounding box, with a cloud cover filter (<code>cloud_lt</code>).</li>
+<li><strong>Compute pre vs post means</strong> of NDVI for each pixel.</li>
+<li><strong>Rasterize the fire polygon</strong> to the NDVI grid to identify burned pixels.</li>
+<li>
+<p><strong>Label pixels</strong>: collapse = 1 if NDVI drop exceeds a threshold (relative or absolute); non‑collapse = 0 otherwise.</p>
+</li>
+<li>
+<p>Relative drop:
+     $\text{rel_drop} = \frac{\text{pre_mean} - \text{post_mean}}{|\text{pre_mean}| + \varepsilon}$
+     If <code>rel_drop &gt; \theta</code> (e.g., (\theta = 0.30)) inside the fire scar, label = 1.</p>
+</li>
+<li>Absolute drop: If post – pre &lt; threshold (e.g., –0.20), label = 1.</li>
+<li>
+<p><strong>Extract early‑warning features</strong> from each pixel’s NDVI time series:</p>
+</li>
+<li>
+<p><em>Slope</em>: overall trend;</p>
+</li>
+<li><em>Variance</em>: volatility over time;</li>
+<li><em>Variance ratio</em>: short vs long window variance;</li>
+<li><em>Autocorrelation (AC1)</em>: lag‑1 memory;</li>
+<li><em>Last, Δ(last–first), minimum, maximum</em>: trajectory summary.</li>
+<li><strong>Train a Random Forest classifier</strong> (Breiman 2001) with grouped cross‑validation by fire (GroupKFold) to avoid leakage across pixels from the same event.</li>
+<li><strong>Evaluate performance</strong> using ROC‑AUC, average precision (PR‑AUC), precision, recall, and F1 for the positive (collapse) class.</li>
+<li><strong>Interpret outputs</strong>: feature importances, per‑fire summaries, and optional spatial maps of predicted collapse.</li>
+</ol>
+<h2 id="mathematical-framing">Mathematical Framing</h2>
+<p>We treat NDVI as a proxy for green biomass and canopy condition. Persistent collapse is operationalized as a significant NDVI drop post‑fire that does not rebound within the defined window.</p>
+<ul>
+<li><strong>Label rule</strong>: collapse if relative or absolute NDVI decline exceeds a threshold.</li>
+<li><strong>EWS features</strong> capture time‑series properties theorized to increase near critical transitions (Scheffer et al. 2009; Dakos et al. 2012).</li>
+<li><strong>Model</strong>: Random Forest learns nonlinear mappings from feature space → probability of collapse.</li>
+</ul>
+<h2 id="model-validation">Model &amp; Validation</h2>
+<ul>
+<li><strong>Classifier</strong>: Random Forest with \~500 trees, class‑weighted, <code>min_samples_leaf = 2</code>.</li>
+<li><strong>Grouping</strong>: GroupKFold by fire to prevent over‑optimistic results.</li>
+<li><strong>Metrics</strong>: ROC‑AUC, PR‑AUC, positive‑class precision, recall, and F1.</li>
+<li><strong>Outputs</strong>: bar plot of feature importances; summary tables of per‑fire performance and data coverage.</li>
+</ul>
+<h2 id="example-use-case">Example Use Case</h2>
+<p><strong>Research question</strong>: Within large fires from 2018–2023, where did vegetation most likely transition to a persistent low‑NDVI state?
+Steps:</p>
+<ol>
+<li>Filter FIRED events based on size and date.</li>
+<li>Build dataset with <code>rel_drop_threshold=0.30</code>, <code>cloud_lt=20</code> (relax to 60 if imagery is sparse).</li>
+<li>Train Random Forest with grouped cross‑validation.</li>
+<li>Inspect performance and feature importance; map collapse risk within each burn.</li>
+<li>Export summaries to guide restoration prioritization.</li>
+</ol>
+<h2 id="limitations-best-practices">Limitations &amp; Best Practices</h2>
+<ul>
+<li><strong>Label uncertainty</strong>: NDVI collapse does not guarantee irreversible ecological state change; field data are crucial for validation.</li>
+<li><strong>Window design</strong>: At least 2–3 windows pre‑ and post‑fire are needed to avoid mistaking short‑term scorch for collapse.</li>
+<li><strong>Cloud/seasonal effects</strong>: Clouds and seasonal phenology can bias NDVI features; seasonal adjustment is recommended.</li>
+<li><strong>Domain shift</strong>: Models trained on one ecoregion or period may not generalize elsewhere; always use grouped CV and out‑of‑region testing.</li>
+</ul>
+<h2 id="references">References</h2>
+<ul>
+<li>Andela, N., Morton, D. C., Giglio, L., Chen, Y., van der Werf, G. R., Kasibhatla, P. S., DeFries, R. S., Collatz, G. J., Hantson, S., Kloster, S., Bachelet, D., Forrest, M., Lasslop, G., Li, F., Mangeon, S., Melton, J. R., Yue, C., &amp; Randerson, J. T. (2019). The Global Fire Atlas of individual fire size, duration, speed and direction. <em>Nature Ecology &amp; Evolution</em>, 3, 1494–1502. <a href="https://doi.org/10.1038/s41559-019-0386-1">https://doi.org/10.1038/s41559-019-0386-1</a></li>
+<li>Balch, J. K., et al. (2020). FIRED: a global fire event database for the analysis of fire regimes, patterns, and drivers. CU Scholar Dataset.</li>
+<li>Scheffer, M., Bascompte, J., Brock, W. A., Brovkin, V., Carpenter, S. R., Dakos, V., Held, H., van Nes, E. H., Rietkerk, M., &amp; Sugihara, G. (2009). Early‑warning signals for critical transitions. <em>Nature</em>, 461, 53–59. <a href="https://doi.org/10.1038/nature08227">https://doi.org/10.1038/nature08227</a></li>
+<li>Dakos, V., Carpenter, S. R., Brock, W. A., Ellison, A. M., Guttal, V., Ives, A. R., Kéfi, S., Livina, V., Seekell, D. A., van Nes, E. H., &amp; Scheffer, M. (2012). Methods for detecting early warnings of critical transitions in time series: A review. <em>PLOS ONE</em>, 7(7), e41010. <a href="https://doi.org/10.1371/journal.pone.0041010">https://doi.org/10.1371/journal.pone.0041010</a></li>
+<li>Kéfi, S., Guttal, V., Brock, W. A., Carpenter, S. R., Ellison, A. M., Livina, V. N., Seekell, D. A., van Nes, E. H., &amp; Scheffer, M. (2014). Early warning signals of ecological transitions: methods for spatial patterns. <em>Philosophical Transactions of the Royal Society B</em>, 370(1659), 20130283. <a href="https://doi.org/10.1098/rstb.2013.0283">https://doi.org/10.1098/rstb.2013.0283</a></li>
+<li>Breiman, L. (2001). Random forests. <em>Machine Learning</em>, 45(1), 5–32. <a href="https://doi.org/10.1023/A:1010933404324">https://doi.org/10.1023/A:1010933404324</a></li>
+<li>Hesketh, M., et al. (2021). Detecting post‑fire vegetation recovery using remote sensing and machine learning. <em>Remote Sensing of Environment</em>, 257, 112210. <a href="https://doi.org/10.1016/j.rse.2020.112210">https://doi.org/10.1016/j.rse.2020.112210</a></li>
+<li>Liu, X., et al. (2020). Remote sensing‑based early warning of vegetation degradation. <em>Ecological Indicators</em>, 115, 106764. <a href="https://doi.org/10.1016/j.ecolind.2020.106764">https://doi.org/10.1016/j.ecolind.2020.106764</a></li>
+</ul>
+<hr />
+<h2 id="code">Code</h2>
+<blockquote>
+<p><strong>Note:</strong> Requires rasterio, numpy, pandas, shapely, pystac-client, scikit-learn, and matplotlib.</p>
+</blockquote>
+<pre><code class="language-python">
+# ===================== DEPENDENCIES: fetch_ndvi_stack + _extract_ews_features =====================
+# Requires: rasterio, numpy, pandas, pystac-client (pip install pystac-client)
+# Notes:
+#  - Works with Sentinel-2 L2A on Element84 Earth Search or compatible STAC.
+#  - Uses per-window &quot;best single item&quot; by lowest eo:cloud_cover.
+#  - Warps all reads to a common EPSG:4326 grid aligned to your bbox.
+
+from types import SimpleNamespace
+from pystac_client import Client
+import rasterio
+from rasterio.vrt import WarpedVRT
+from rasterio.warp import Resampling
+from rasterio.transform import from_bounds
+
+def fetch_ndvi_stack(
+    stac_api: str,
+    collection: str,
+    date_ranges: Sequence[str],   # list like [&quot;YYYY-MM-DDT00:00:00Z/YYYY-MM-DDT23:59:59Z&quot;, ...]
+    bbox: Sequence[float],        # [minx, miny, maxx, maxy] in EPSG:4326
+    cloud_lt: int = 20,
+    overview_level: int = 4,      # ignored in this simplified version; grid size set by bbox
+    max_search_items: int = 50,
+    prefer_smallest_cloud: bool = True,
+) -&gt; SimpleNamespace:
+    &quot;&quot;&quot;
+    Returns: SimpleNamespace(
+        ndvi = np.ndarray shape (T,H,W) with float32 in [-1,1] (NaN where missing),
+        dates = list of ISO strings (len T),
+        transform = affine transform for EPSG:4326 grid,
+        crs = 'EPSG:4326',
+        bbox = tuple(minx,miny,maxx,maxy)
+    )
+    &quot;&quot;&quot;
+    # 1) Choose a reasonable grid for the bbox (aim ~512 px on the long side)
+    minx, miny, maxx, maxy = map(float, bbox)
+    dx, dy = maxx - minx, maxy - miny
+    long_side = max(dx, dy)
+    target_long_pixels = 512
+    # keep aspect ratio
+    if dx &gt;= dy:
+        W = target_long_pixels
+        H = max(1, int(round(target_long_pixels * (dy / dx)))) if dx &gt; 0 else 1
+    else:
+        H = target_long_pixels
+        W = max(1, int(round(target_long_pixels * (dx / dy)))) if dy &gt; 0 else 1
+    transform = from_bounds(minx, miny, maxx, maxy, W, H)
+    crs = &quot;EPSG:4326&quot;
+
+    # 2) Open STAC
+    client = Client.open(stac_api)
+
+    ndvi_slices = []
+    out_dates = []
+
+    # Helper to pick item with lowest cloud cover
+    def _pick_item(items):
+        if not items:
+            return None
+        if prefer_smallest_cloud:
+            items = sorted(items, key=lambda it: it.properties.get(&quot;eo:cloud_cover&quot;, 1000))
+        return items[0]
+
+    # 3) For each date window, search, pick best item, compute NDVI onto our grid
+    for dr in date_ranges:
+        search = client.search(
+            collections=[collection],
+            bbox=[minx, miny, maxx, maxy],
+            datetime=dr,
+            query={&quot;eo:cloud_cover&quot;: {&quot;lt&quot;: cloud_lt}},
+            limit=max_search_items,
+        )
+        items = list(search.get_items())
+        item = _pick_item(items)
+        if item is None:
+            # No imagery for this window -&gt; append NaN slice
+            ndvi_slices.append(np.full((H, W), np.nan, dtype=&quot;float32&quot;))
+            out_dates.append(dr.split(&quot;/&quot;)[1][:10] if &quot;/&quot; in dr else dr[:10])
+            continue
+
+        # Sentinel-2 L2A common keys for red &amp; nir; fallback names added just in case
+        # (Element84 uses e.g., 'red' and 'nir' asset keys)
+        red_asset = item.assets.get(&quot;red&quot;) or item.assets.get(&quot;B04&quot;) or item.assets.get(&quot;B4&quot;)
+        nir_asset = item.assets.get(&quot;nir&quot;) or item.assets.get(&quot;B08&quot;) or item.assets.get(&quot;B8&quot;)
+        if (red_asset is None) or (nir_asset is None):
+            ndvi_slices.append(np.full((H, W), np.nan, dtype=&quot;float32&quot;))
+            out_dates.append(item.properties.get(&quot;datetime&quot;, dr)[:10])
+            continue
+
+        # Read and warp to our target grid in EPSG:4326
+        def _read_warped(url: str) -&gt; np.ndarray:
+            with rasterio.open(url) as src:
+                vrt_opts = dict(crs=crs, transform=transform, width=W, height=H, resampling=Resampling.bilinear)
+                with WarpedVRT(src, **vrt_opts) as vrt:
+                    arr = vrt.read(1, out_dtype=&quot;float32&quot;, masked=True)
+                    return np.where(arr.mask, np.nan, arr.filled(np.nan)).astype(&quot;float32&quot;)
+
+        try:
+            red = _read_warped(red_asset.href)
+            nir = _read_warped(nir_asset.href)
+            ndvi = (nir - red) / (nir + red + 1e-6)
+            # Clip to plausible range
+            ndvi = np.clip(ndvi, -1.0, 1.0).astype(&quot;float32&quot;)
+        except Exception:
+            ndvi = np.full((H, W), np.nan, dtype=&quot;float32&quot;)
+
+        ndvi_slices.append(ndvi)
+        out_dates.append(item.properties.get(&quot;datetime&quot;, dr)[:10])
+
+    if not ndvi_slices:
+        raise RuntimeError(&quot;fetch_ndvi_stack: no NDVI slices were created.&quot;)
+
+    ndvi_stack = np.stack(ndvi_slices, axis=0)  # (T,H,W)
+    return SimpleNamespace(ndvi=ndvi_stack, dates=out_dates, transform=transform, crs=crs, bbox=(minx, miny, maxx, maxy))
+
+# -------------------- EWS feature extraction from (T,H,W) NDVI cube --------------------
+def _extract_ews_features(ndvi_stack: np.ndarray) -&gt; Dict[str, np.ndarray]:
+    &quot;&quot;&quot;
+    Convert (T,H,W) NDVI into per-pixel features expected by your model.
+    Features (all HxW):
+      - slope: least-squares trend over t=0..T-1
+      - var_all: variance over full series
+      - var_ratio: variance(second half) / (variance(first half)+eps)
+      - ac1: lag-1 autocorrelation
+      - last: last finite value
+      - d_last_first: last - first finite
+      - vmin, vmax: min/max over series
+    &quot;&quot;&quot;
+    if ndvi_stack.ndim != 3:
+        raise ValueError(f&quot;_extract_ews_features expects (T,H,W), got {ndvi_stack.shape}&quot;)
+
+    T, H, W = ndvi_stack.shape
+    x = np.arange(T, dtype=&quot;float32&quot;)[:, None, None]
+    y = ndvi_stack.astype(&quot;float32&quot;)
+
+    # Masks
+    valid = np.isfinite(y)
+
+    # --- slope via least squares on demeaned x ---
+    x0 = x - x.mean(axis=0, keepdims=True)  # center time
+    y0 = np.where(valid, y, 0.0)
+    denom = (x0**2).sum(axis=0) + 1e-6
+    slope = ((x0 * y0).sum(axis=0)) / denom
+
+    # --- variance over all, and halves ---
+    with np.errstate(invalid=&quot;ignore&quot;):
+        var_all = np.nanvar(y, axis=0)
+        mid = T // 2
+        var_first = np.nanvar(y[:mid], axis=0) if mid &gt; 1 else np.full((H, W), np.nan, dtype=&quot;float32&quot;)
+        var_second = np.nanvar(y[mid:], axis=0) if (T - mid) &gt; 1 else np.full((H, W), np.nan, dtype=&quot;float32&quot;)
+        var_ratio = var_second / (np.abs(var_first) + 1e-6)
+
+    # --- lag-1 autocorrelation ---
+    def _nanmean(a, axis=0):
+        with np.errstate(invalid=&quot;ignore&quot;):
+            return np.nanmean(a, axis=axis)
+    mu = _nanmean(y, axis=0)
+    y_center = y - mu
+    y_lag = y_center[1:]
+    y_lead = y_center[:-1]
+    num = (y_lead * y_lag)
+    den = (y_lead**2)
+    # sum over time while ignoring NaNs
+    num_sum = np.nansum(num, axis=0)
+    den_sum = np.nansum(den, axis=0) + 1e-6
+    ac1 = num_sum / den_sum
+
+    # --- last, first, delta ---
+    def _nan_first(a):
+        # first finite along axis=0
+        idx = np.argmax(np.isfinite(a), axis=0)
+        out = a[idx, np.arange(a.shape[1])[:, None], np.arange(a.shape[2])]
+        out[~np.isfinite(out)] = np.nan
+        return out
+    def _nan_last(a):
+        # last finite along axis=0
+        rev = np.flip(a, axis=0)
+        idx = np.argmax(np.isfinite(rev), axis=0)
+        out = rev[idx, np.arange(a.shape[1])[:, None], np.arange(a.shape[2])]
+        out[~np.isfinite(out)] = np.nan
+        return out
+
+    first = _nan_first(y)
+    last = _nan_last(y)
+    d_last_first = last - first
+
+    # --- min/max over time ---
+    vmin = np.nanmin(y, axis=0)
+    vmax = np.nanmax(y, axis=0)
+
+    # sanitize dtypes
+    def f32(a): return a.astype(&quot;float32&quot;, copy=False)
+
+    return dict(
+        slope=f32(slope),
+        var_all=f32(var_all),
+        var_ratio=f32(var_ratio),
+        ac1=f32(ac1),
+        last=f32(last),
+        d_last_first=f32(d_last_first),
+        vmin=f32(vmin),
+        vmax=f32(vmax),
+    )
+    # ===================== MULTI-FIRE RF TIPPING (3-FUNCTION SCRIPT) =====================
+# Public API:
+#   1) get_data_and_labels(fired_gdf, ...)
+#   2) run_model(data, ...)
+#   3) produce_figures(fired_rows, rf, feature_names, ...)
+#
+# Requires: numpy, pandas, shapely, rasterio, scikit-learn, matplotlib
+# Expects you ALREADY HAVE:
+#   - fetch_ndvi_stack(stac_api, collection, date_ranges, bbox, cloud_lt, overview_level)
+#   - _extract_ews_features(ndvi_stack) -&gt; dict with keys:
+#       [&quot;slope&quot;, &quot;var_all&quot;, &quot;var_ratio&quot;, &quot;ac1&quot;, &quot;last&quot;, &quot;d_last_first&quot;, &quot;vmin&quot;, &quot;vmax&quot;]
+
+import sys
+import warnings
+import datetime as dt
+from typing import Sequence, Dict, Any, Optional, Tuple, List, Iterable
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+from shapely.geometry import mapping
+import rasterio
+from rasterio import features as rfeatures
+from rasterio.transform import from_bounds
+
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import GroupKFold
+from sklearn.metrics import classification_report, roc_auc_score, average_precision_score
+
+# ------------------------------ small helpers ------------------------------
+def _make_rolling_windows(start: dt.datetime, end: dt.datetime,
+                          step_days: int = 12, window_days: int = 10) -&gt; List[str]:
+    if end &lt; start:
+        return []
+    out = []
+    cur = start
+    while cur &lt;= end:
+        w_end = min(end, cur + dt.timedelta(days=window_days - 1))
+        out.append(f&quot;{cur.strftime('%Y-%m-%d')}T00:00:00Z/{w_end.strftime('%Y-%m-%d')}T23:59:59Z&quot;)
+        cur += dt.timedelta(days=step_days)
+    return out
+
+def _bbox_from_geom(geom, pad_frac: float = 0.02) -&gt; Tuple[float, float, float, float]:
+    minx, miny, maxx, maxy = geom.bounds
+    dx, dy = maxx - minx, maxy - miny
+    pad_x, pad_y = dx * pad_frac, dy * pad_frac
+    return (minx - pad_x, miny - pad_y, maxx + pad_x, maxy + pad_y)
+
+def _coerce_ts(val) -&gt; pd.Timestamp:
+    if isinstance(val, (pd.Timestamp, np.datetime64)):
+        return pd.Timestamp(val)
+    if isinstance(val, (dt.datetime, dt.date)):
+        return pd.Timestamp(val)
+    return pd.to_datetime(val, errors=&quot;raise&quot;, utc=False)
+
+def _fire_ig_date(row) -&gt; dt.datetime:
+    &quot;&quot;&quot;
+    Robustly extract ignition date from a FIRED row (from .itertuples()).
+    Tries common variants and falls back to scanning attribute names.
+    &quot;&quot;&quot;
+    likely_names = [
+        &quot;ig_date&quot;, &quot;ignition_date&quot;, &quot;start_date&quot;, &quot;ig_dt&quot;, &quot;start_dt&quot;,
+        &quot;date_ignition&quot;, &quot;igdate&quot;, &quot;DATE_IGNITION&quot;, &quot;IG_DATE&quot;
+    ]
+    for nm in likely_names:
+        if hasattr(row, nm):
+            return _coerce_ts(getattr(row, nm)).to_pydatetime()
+
+    for nm in getattr(row, &quot;_fields&quot;, []):
+        if (&quot;ig&quot; in nm.lower() or &quot;ignit&quot; in nm.lower() or &quot;start&quot; in nm.lower()) and &quot;date&quot; in nm.lower():
+            return _coerce_ts(getattr(row, nm)).to_pydatetime()
+
+    for nm in getattr(row, &quot;_fields&quot;, []):
+        val = getattr(row, nm)
+        try:
+            ts = _coerce_ts(val)
+            if 2000 &lt;= ts.year &lt;= 2035:
+                return ts.to_pydatetime()
+        except Exception:
+            pass
+
+    raise ValueError(&quot;Could not find an ignition date column on this row (e.g., 'ig_date').&quot;)
+
+def _print_once(msg: str, key: str, seen: set):
+    if key not in seen:
+        print(msg, file=sys.stderr)
+        seen.add(key)
+
+# ------------------------------ core builder ------------------------------
+def _build_dataset_from_fires(
+    fired_gdf,                              # GeoDataFrame with FIRED events (EPSG:4326)
+    stac_api: str = &quot;https://earth-search.aws.element84.com/v1&quot;,
+    collection: str = &quot;sentinel-2-l2a&quot;,
+    select_idx: Optional[Sequence[int]] = None,  # row indices to use (or None for all)
+    pre_days: int = 120,
+    post_days: int = 180,
+    step_days: int = 12,
+    window_days: int = 10,
+    cloud_lt: int = 20,
+    overview_level: int = 4,
+    # labeling options
+    use_relative_drop: bool = True,
+    abs_drop_threshold: float = -0.20,
+    rel_drop_threshold: float = 0.30,
+    # sampling / memory
+    max_pixels_per_fire: int = 60000,
+    random_state: int = 42,
+    verbose: bool = True,
+) -&gt; Dict[str, Any]:
+    &quot;&quot;&quot;
+    Loops over many FIRED polygons, builds features+labels per fire, and concatenates
+    into a single dataset with group IDs for CV.
+    Returns: dict with X, y, groups, feature_names, per_fire_records, failures, logs.
+    &quot;&quot;&quot;
+    rng = np.random.default_rng(random_state)
+    iterator = (fired_gdf.itertuples(index=True) if select_idx is None
+                else fired_gdf.iloc[list(select_idx)].itertuples(index=True))
+
+    all_X, all_y, all_groups = [], [], []
+    per_fire_records, failures, logs = [], [], []
+    feature_names = [&quot;slope&quot;, &quot;var_all&quot;, &quot;var_ratio&quot;, &quot;ac1&quot;, &quot;last&quot;, &quot;d_last_first&quot;, &quot;vmin&quot;, &quot;vmax&quot;]
+    fire_counter = 0
+    seen_msgs = set()
+
+    for row in iterator:
+        idx = row.Index
+        try:
+            ig = _fire_ig_date(row)
+            geom = row.geometry
+            if geom is None or geom.is_empty:
+                raise ValueError(&quot;Empty geometry.&quot;)
+
+            pre_start  = ig - dt.timedelta(days=pre_days)
+            pre_end    = ig - dt.timedelta(days=1)
+            post_start = ig + dt.timedelta(days=1)
+            post_end   = ig + dt.timedelta(days=post_days)
+
+            pre_windows  = _make_rolling_windows(pre_start,  pre_end,  step_days, window_days)
+            post_windows = _make_rolling_windows(post_start, post_end, step_days, window_days)
+            if len(pre_windows) &lt; 2 or len(post_windows) &lt; 2:
+                raise ValueError(f&quot;Too few time windows (pre={len(pre_windows)}, post={len(post_windows)}).&quot;)
+            date_ranges = pre_windows + post_windows
+
+            bbox = _bbox_from_geom(geom, pad_frac=0.02)
+
+            # ---- Your external helper: fetch_ndvi_stack ----
+            stack = fetch_ndvi_stack(
+                stac_api=stac_api,
+                collection=collection,
+                date_ranges=date_ranges,
+                bbox=list(bbox),
+                cloud_lt=cloud_lt,
+                overview_level=overview_level,
+            )
+            if not hasattr(stack, &quot;ndvi&quot;):
+                raise ValueError(&quot;fetch_ndvi_stack returned object without .ndvi&quot;)
+
+            arr = np.asarray(stack.ndvi)  # (T,H,W)
+            if arr.ndim != 3:
+                raise ValueError(f&quot;NDVI stack shape {arr.shape} (expected T,H,W).&quot;)
+            T, H, W = arr.shape
+            if T &lt; 4 or H &lt; 8 or W &lt; 8:
+                raise ValueError(f&quot;NDVI stack too small or empty: {arr.shape}&quot;)
+
+            mid = len(date_ranges) // 2
+            if mid &lt;= 0 or mid &gt;= T:
+                raise ValueError(f&quot;Split index invalid (mid={mid}, T={T}).&quot;)
+
+            pre_mean  = np.nanmean(arr[:mid], axis=0)
+            post_mean = np.nanmean(arr[mid:], axis=0)
+            ndvi_delta = post_mean - pre_mean
+
+            transform = rasterio.transform.from_bounds(*bbox, W, H)
+            fire_mask = rfeatures.rasterize(
+                [(mapping(geom), 1)], out_shape=(H, W), transform=transform, fill=0, dtype=np.uint8
+            )
+
+            if use_relative_drop:
+                rel = (pre_mean - post_mean) / (np.abs(pre_mean) + 1e-6)
+                labels = ((fire_mask == 1) &amp; np.isfinite(rel) &amp; (rel &gt; rel_drop_threshold)).astype(np.uint8)
+            else:
+                labels = ((fire_mask == 1) &amp; np.isfinite(ndvi_delta) &amp; (ndvi_delta &lt; abs_drop_threshold)).astype(np.uint8)
+
+            # ---- Your external helper: _extract_ews_features ----
+            feats = _extract_ews_features(arr)
+            missing = [k for k in feature_names if k not in feats]
+            if missing:
+                raise ValueError(f&quot;_extract_ews_features missing keys: {missing}&quot;)
+
+            X_full = np.stack([feats[k] for k in feature_names], axis=-1).reshape(-1, len(feature_names))
+            y_full = labels.reshape(-1)
+
+            ok = np.isfinite(X_full).all(axis=1) &amp; np.isfinite(y_full)
+            X_full, y_full = X_full[ok], y_full[ok]
+            if X_full.size == 0:
+                raise ValueError(&quot;No valid pixels after NaN filtering.&quot;)
+
+            if X_full.shape[0] &gt; max_pixels_per_fire:
+                sel = rng.choice(np.arange(X_full.shape[0]), size=max_pixels_per_fire, replace=False)
+                X_full, y_full = X_full[sel], y_full[sel]
+
+            n_pos = int(y_full.sum())
+            if n_pos == 0:
+                _print_once(&quot;Note: some fires have 0 positives at rel_drop=0.30. &quot;
+                            &quot;Try rel_drop_threshold=0.15 or abs_drop mode.&quot;, &quot;zero_pos&quot;, seen_msgs)
+                logs.append(dict(fire_index=int(idx), message=&quot;Zero positives; consider relaxing thresholds.&quot;))
+                continue
+
+            all_X.append(X_full)
+            all_y.append(y_full)
+            all_groups.append(np.full(y_full.shape[0], fire_counter, dtype=np.int32))
+
+            per_fire_records.append(dict(
+                fire_index=int(idx),
+                ig_date=str(pd.Timestamp(ig).date()),
+                n_pixels=int(y_full.size),
+                n_positive=int(n_pos),
+                bbox=bbox
+            ))
+            fire_counter += 1
+
+        except Exception as e:
+            msg = f&quot;[fire idx {idx}] {type(e).__name__}: {e}&quot;
+            failures.append(dict(fire_index=int(idx), error=str(e)))
+            if verbose:
+                print(msg, file=sys.stderr)
+
+    if not all_X:
+        raise RuntimeError(
+            &quot;No fires produced training data. Common fixes:\n&quot;
+            &quot;  • Relax thresholds: rel_drop_threshold=0.15 (or 0.10)\n&quot;
+            &quot;  • Loosen cloud filter: cloud_lt=60\n&quot;
+            &quot;  • Widen windows: window_days=20, step_days=10 (ensure &gt;=2 pre and &gt;=2 post)\n&quot;
+            &quot;  • Inspect `failures` for column name / imagery issues.&quot;
+        )
+
+    X = np.vstack(all_X)
+    y = np.concatenate(all_y)
+    groups = np.concatenate(all_groups)
+
+    return dict(
+        X=X, y=y, groups=groups,
+        feature_names=[&quot;slope&quot;, &quot;var_all&quot;, &quot;var_ratio&quot;, &quot;ac1&quot;, &quot;last&quot;, &quot;d_last_first&quot;, &quot;vmin&quot;, &quot;vmax&quot;],
+        per_fire_records=per_fire_records,
+        failures=failures,
+        logs=logs
+    )
+
+def _train_rf_groupcv(
+    X: np.ndarray,
+    y: np.ndarray,
+    groups: np.ndarray,
+    feature_names: Sequence[str],
+    n_splits: int = 5,
+    random_state: int = 42,
+) -&gt; Dict[str, Any]:
+    &quot;&quot;&quot;
+    Grouped cross-validation by fire: no pixel leakage across fires.
+    Returns per-fold metrics, final model fit on all data, and feature importances.
+    &quot;&quot;&quot;
+    gkf = GroupKFold(n_splits=min(n_splits, len(np.unique(groups))))
+    rf_params = dict(
+        n_estimators=500, max_depth=None, min_samples_leaf=2,
+        class_weight=&quot;balanced&quot;, n_jobs=-1, random_state=random_state
+    )
+
+    fold_reports = []
+    y_true_all, y_prob_all = [], []
+
+    for k, (tr, te) in enumerate(gkf.split(X, y, groups)):
+        rf = RandomForestClassifier(**rf_params)
+        rf.fit(X[tr], y[tr])
+
+        prob = rf.predict_proba(X[te])[:, 1]
+        pred = (prob &gt;= 0.5).astype(np.uint8)
+
+        y_true_all.append(y[te]); y_prob_all.append(prob)
+
+        rpt = classification_report(y[te], pred, digits=3, output_dict=True, zero_division=0)
+        try:
+            roc = roc_auc_score(y[te], prob)
+            pr  = average_precision_score(y[te], prob)
+        except Exception:
+            roc, pr = np.nan, np.nan
+
+        fold_reports.append(dict(
+            fold=k+1,
+            support_pos=int((y[te]==1).sum()),
+            precision_pos=rpt.get(&quot;1&quot;, {}).get(&quot;precision&quot;, np.nan),
+            recall_pos=rpt.get(&quot;1&quot;, {}).get(&quot;recall&quot;, np.nan),
+            f1_pos=rpt.get(&quot;1&quot;, {}).get(&quot;f1-score&quot;, np.nan),
+            roc_auc=roc,
+            avg_precision=pr
+        ))
+
+    rf_final = RandomForestClassifier(**rf_params).fit(X, y)
+    importances = rf_final.feature_importances_
+
+    df_rep = pd.DataFrame(fold_reports)
+    with np.errstate(invalid='ignore'):
+        summary = dict(
+            folds=len(df_rep),
+            mean_precision_pos=float(df_rep[&quot;precision_pos&quot;].mean()),
+            mean_recall_pos=float(df_rep[&quot;recall_pos&quot;].mean()),
+            mean_f1_pos=float(df_rep[&quot;f1_pos&quot;].mean()),
+            mean_roc_auc=float(df_rep[&quot;roc_auc&quot;].mean()),
+            mean_avg_precision=float(df_rep[&quot;avg_precision&quot;].mean())
+        )
+
+    # Ready-made importances fig (optional display)
+    fig_imp = plt.figure(figsize=(5, 3.5))
+    order = np.argsort(importances)
+    plt.barh(np.array(feature_names)[order], importances[order])
+    plt.title(&quot;Random Forest feature importances&quot;)
+    plt.tight_layout()
+
+    return dict(
+        rf=rf_final,
+        feature_names=list(feature_names),
+        importances=importances,
+        cv_folds=df_rep,
+        cv_summary=summary,
+        fig_importances=fig_imp
+    )
+
+def _plot_faceted_fires(
+    fired_rows: Iterable,
+    rf: RandomForestClassifier,
+    feature_names: Sequence[str],
+    *,
+    stac_api: str = &quot;https://earth-search.aws.element84.com/v1&quot;,
+    collection: str = &quot;sentinel-2-l2a&quot;,
+    pre_days: int = 120,
+    post_days: int = 150,
+    step_days: int = 10,
+    window_days: int = 20,
+    cloud_lt: int = 60,
+    overview_level: int = 4,
+    pad_frac: float = 0.02,
+    ndvi_vmin: float = -0.2,
+    ndvi_vmax: float = 0.9,
+    prob_vmin: float = 0.0,
+    prob_vmax: float = 1.0,
+    max_fires: int = 6,
+    suptitle: str = &quot;Sentinel-2 NDVI Early-Warning + Random Forest Tipping Analysis&quot;
+):
+    &quot;&quot;&quot;
+    For each fire:
+      Col 1: Latest NDVI frame
+      Col 2: RF probability (masked to perimeter)
+      Col 3: Global feature importances (same for all rows)
+    Returns (fig, panels)
+    &quot;&quot;&quot;
+    rows_list = list(fired_rows)[:max_fires]
+    if not rows_list:
+        raise ValueError(&quot;No fires provided to _plot_faceted_fires.&quot;)
+
+    n = len(rows_list)
+    ncols = 3
+    nrows = n
+    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(12, 4.2*n), constrained_layout=True)
+    if n == 1:
+        axes = np.array([axes])
+
+    panels = []
+    importances = rf.feature_importances_
+    order = np.argsort(importances)
+    fnames = np.array(feature_names)
+
+    for rix, row in enumerate(rows_list):
+        idx = getattr(row, &quot;Index&quot;, rix)
+        try:
+            ig = _fire_ig_date(row)
+            geom = row.geometry
+            if geom is None or geom.is_empty:
+                raise ValueError(&quot;Empty geometry.&quot;)
+
+            pre_start  = ig - dt.timedelta(days=pre_days)
+            pre_end    = ig - dt.timedelta(days=1)
+            post_start = ig + dt.timedelta(days=1)
+            post_end   = ig + dt.timedelta(days=post_days)
+            pre_windows  = _make_rolling_windows(pre_start,  pre_end,  step_days, window_days)
+            post_windows = _make_rolling_windows(post_start, post_end, step_days, window_days)
+            if len(pre_windows) &lt; 2 or len(post_windows) &lt; 2:
+                raise ValueError(f&quot;Too few time windows (pre={len(pre_windows)}, post={len(post_windows)}).&quot;)
+            date_ranges = pre_windows + post_windows
+
+            bbox = _bbox_from_geom(geom, pad_frac=pad_frac)
+            stack = fetch_ndvi_stack(
+                stac_api=stac_api, collection=collection,
+                date_ranges=date_ranges, bbox=list(bbox),
+                cloud_lt=cloud_lt, overview_level=overview_level
+            )
+            if not hasattr(stack, &quot;ndvi&quot;):
+                raise ValueError(&quot;fetch_ndvi_stack returned object without .ndvi&quot;)
+            arr = np.asarray(stack.ndvi)  # (T,H,W)
+            if arr.ndim != 3:
+                raise ValueError(f&quot;NDVI stack has unexpected shape {arr.shape} (expected T,H,W).&quot;)
+            T, H, W = arr.shape
+            transform = from_bounds(*bbox, W, H)
+
+            latest_ndvi = arr[-1]
+
+            feats = _extract_ews_features(arr)
+            missing = [k for k in feature_names if k not in feats]
+            if missing:
+                raise ValueError(f&quot;_extract_ews_features missing keys: {missing}&quot;)
+            feat_stack = np.stack([feats[k] for k in feature_names], axis=-1)  # (H,W,F)
+            flat = feat_stack.reshape(-1, feat_stack.shape[-1])
+            with warnings.catch_warnings():
+                warnings.simplefilter(&quot;ignore&quot;)
+                prob = rf.predict_proba(flat)[:, 1].reshape(H, W)
+
+            fire_mask = rfeatures.rasterize(
+                [(mapping(geom), 1)],
+                out_shape=(H, W), transform=transform, fill=0, dtype=np.uint8
+            ).astype(bool)
+            prob_masked = np.where(fire_mask, prob, np.nan)
+
+            # --- Col 1: NDVI ---
+            ax1 = axes[rix, 0]
+            im1 = ax1.imshow(
+                latest_ndvi, origin=&quot;upper&quot;,
+                extent=[bbox[0], bbox[2], bbox[1], bbox[3]],
+                vmin=ndvi_vmin, vmax=ndvi_vmax, cmap=&quot;viridis&quot;, interpolation=&quot;nearest&quot;
+            )
+            gtype = getattr(geom, &quot;geom_type&quot;, None) or getattr(geom, &quot;type&quot;, None)
+            if gtype in (&quot;Polygon&quot;, &quot;MultiPolygon&quot;):
+                polys = [geom] if gtype == &quot;Polygon&quot; else list(geom.geoms)
+                for poly in polys:
+                    x, y = poly.exterior.xy
+                    ax1.plot(x, y, lw=1.0, color=&quot;white&quot;)
+            ax1.set_ylabel(&quot;Latitude&quot;)
+            ax1.set_title(f&quot;Latest NDVI • {pd.Timestamp(date_ranges[-1].split('/')[1][:10]).date()}&quot;)
+            cbar1 = fig.colorbar(im1, ax=ax1, fraction=0.035, pad=0.02); cbar1.set_label(&quot;NDVI&quot;)
+
+            # --- Col 2: RF probability ---
+            ax2 = axes[rix, 1]
+            im2 = ax2.imshow(
+                prob_masked, origin=&quot;upper&quot;,
+                extent=[bbox[0], bbox[2], bbox[1], bbox[3]],
+                vmin=prob_vmin, vmax=prob_vmax, cmap=&quot;viridis&quot;, interpolation=&quot;nearest&quot;
+            )
+            for poly in polys:
+                x, y = poly.exterior.xy
+                ax2.plot(x, y, lw=1.0, color=&quot;black&quot;)
+            ax2.set_xlabel(&quot;Longitude&quot;)
+            ax2.set_title(&quot;Random Forest Tipping-Risk (probability)&quot;)
+            cbar2 = fig.colorbar(im2, ax=ax2, fraction=0.035, pad=0.02); cbar2.set_label(&quot;RF probability (tipping)&quot;)
+
+            # --- Col 3: Feature importances (global) ---
+            ax3 = axes[rix, 2]
+            ax3.barh(fnames[order], importances[order])
+            ax3.set_title(&quot;Random Forest Feature Importances&quot;)
+            ax3.set_xlim(0, max(0.001, float(importances.max()) * 1.15))
+            for spine in (&quot;top&quot;, &quot;right&quot;):
+                ax3.spines[spine].set_visible(False)
+
+            panels.append(dict(
+                fire_index=idx, bbox=bbox, ndvi=latest_ndvi, prob=prob_masked,
+                transform=transform, geometry=geom
+            ))
+
+        except Exception as e:
+            for c in range(ncols):
+                axes[rix, c].axis(&quot;off&quot;)
+            axes[rix, 0].text(0.02, 0.5, f&quot;Fire {idx}: {type(e).__name__}\n{e}&quot;,
+                              transform=axes[rix, 0].transAxes, ha=&quot;left&quot;, va=&quot;center&quot;)
+            panels.append(dict(fire_index=idx, error=str(e)))
+
+    fig.suptitle(suptitle, y=0.995, fontsize=14)
+    return fig, panels
+
+# =============================== PUBLIC API (3 functions) ===============================
+def get_data_and_labels(
+    fired_gdf,
+    *,
+    stac_api: str = &quot;https://earth-search.aws.element84.com/v1&quot;,
+    collection: str = &quot;sentinel-2-l2a&quot;,
+    select_idx: Optional[Sequence[int]] = None,
+    pre_days: int = 120,
+    post_days: int = 180,
+    step_days: int = 12,
+    window_days: int = 10,
+    cloud_lt: int = 20,
+    overview_level: int = 4,
+    use_relative_drop: bool = True,
+    abs_drop_threshold: float = -0.20,
+    rel_drop_threshold: float = 0.30,
+    max_pixels_per_fire: int = 60000,
+    random_state: int = 42,
+    verbose: bool = True,
+) -&gt; Dict[str, Any]:
+    &quot;&quot;&quot;Wrapper that builds the dataset (X, y, groups, metadata).&quot;&quot;&quot;
+    return _build_dataset_from_fires(
+        fired_gdf=fired_gdf,
+        stac_api=stac_api,
+        collection=collection,
+        select_idx=select_idx,
+        pre_days=pre_days,
+        post_days=post_days,
+        step_days=step_days,
+        window_days=window_days,
+        cloud_lt=cloud_lt,
+        overview_level=overview_level,
+        use_relative_drop=use_relative_drop,
+        abs_drop_threshold=abs_drop_threshold,
+        rel_drop_threshold=rel_drop_threshold,
+        max_pixels_per_fire=max_pixels_per_fire,
+        random_state=random_state,
+        verbose=verbose,
+    )
+
+def run_model(
+    data: Dict[str, Any],
+    *,
+    n_splits: int = 5,
+    random_state: int = 42,
+) -&gt; Dict[str, Any]:
+    &quot;&quot;&quot;Wrapper that trains the Random Forest with grouped CV and returns results.&quot;&quot;&quot;
+    return _train_rf_groupcv(
+        X=data[&quot;X&quot;],
+        y=data[&quot;y&quot;],
+        groups=data[&quot;groups&quot;],
+        feature_names=data[&quot;feature_names&quot;],
+        n_splits=n_splits,
+        random_state=random_state,
+    )
+
+def produce_figures(
+    fired_rows: Iterable,
+    rf: RandomForestClassifier,
+    feature_names: Sequence[str],
+    *,
+    stac_api: str = &quot;https://earth-search.aws.element84.com/v1&quot;,
+    collection: str = &quot;sentinel-2-l2a&quot;,
+    pre_days: int = 120,
+    post_days: int = 150,
+    step_days: int = 10,
+    window_days: int = 20,
+    cloud_lt: int = 60,
+    overview_level: int = 4,
+    pad_frac: float = 0.02,
+    ndvi_vmin: float = -0.2,
+    ndvi_vmax: float = 0.9,
+    prob_vmin: float = 0.0,
+    prob_vmax: float = 1.0,
+    max_fires: int = 6,
+    suptitle: str = &quot;Sentinel-2 NDVI Early-Warning + Random Forest Tipping Analysis&quot;
+):
+    &quot;&quot;&quot;Wrapper that produces the faceted per-fire panels (figure + panels list).&quot;&quot;&quot;
+    return _plot_faceted_fires(
+        fired_rows=fired_rows,
+        rf=rf,
+        feature_names=feature_names,
+        stac_api=stac_api,
+        collection=collection,
+        pre_days=pre_days,
+        post_days=post_days,
+        step_days=step_days,
+        window_days=window_days,
+        cloud_lt=cloud_lt,
+        overview_level=overview_level,
+        pad_frac=pad_frac,
+        ndvi_vmin=ndvi_vmin,
+        ndvi_vmax=ndvi_vmax,
+        prob_vmin=prob_vmin,
+        prob_vmax=prob_vmax,
+        max_fires=max_fires,
+        suptitle=suptitle
+    )
+
+# =============================== EXAMPLE (comment out if importing) ===============================
+# Example usage in a notebook (assumes you have `fired_events` GeoDataFrame available):
+# fires_sel = fired_events.query(&quot;ig_year &gt;= 2018 and tot_ar_km2 &gt; 10&quot;).head(5)
+# data = get_data_and_labels(
+#     fired_gdf=fires_sel,
+#     pre_days=120, post_days=150,
+#     step_days=10, window_days=20,
+#     cloud_lt=60,
+#     use_relative_drop=True, rel_drop_threshold=0.15,
+#     max_pixels_per_fire=40000,
+#     verbose=True
+# )
+# print(&quot;Per-fire head:\n&quot;, pd.DataFrame(data[&quot;per_fire_records&quot;]).head())
+# print(&quot;Failures:&quot;, len(data[&quot;failures&quot;]))
+# res = run_model(data, n_splits=5)
+# print(&quot;CV summary:&quot;, res[&quot;cv_summary&quot;])
+# display(res[&quot;fig_importances&quot;])
+#
+# fig_facets, panels = produce_figures(
+#     fired_rows=fires_sel.head(3).itertuples(index=True),
+#    rf=res[&quot;rf&quot;],
+#     feature_names=data[&quot;feature_names&quot;],
+#     stac_api=&quot;https://earth-search.aws.element84.com/v1&quot;,
+#     collection=&quot;sentinel-2-l2a&quot;,
+#     pre_days=120, post_days=150,
+#     step_days=10, window_days=20,
+#     cloud_lt=60,
+#     overview_level=4,
+#     pad_frac=0.02
+# )
+# display(fig_facets)
+</code></pre>
+
+
+
+
+
+
+
+  
+    
+  
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
+    </span>
+    2025-09-16
+  </span>
+
+    
+    
+    
+    
+  </aside>
+
+
+  
+
+
+
+  <form class="md-feedback" name="feedback" hidden>
+    <fieldset>
+      <legend class="md-feedback__title">
+        Was this page helpful?
+      </legend>
+      <div class="md-feedback__inner">
+        <div class="md-feedback__list">
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="This page was helpful" data-md-value="1">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 9v12H1V9zm4 12a2 2 0 0 1-2-2V9c0-.55.22-1.05.59-1.41L14.17 1l1.06 1.06c.27.27.44.64.44 1.05l-.03.32L14.69 8H21a2 2 0 0 1 2 2v2c0 .26-.05.5-.14.73l-3.02 7.05C19.54 20.5 18.83 21 18 21zm0-2h9.03L21 12v-2h-8.79l1.13-5.32L9 9.03z"/></svg>
+            </button>
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="This page could be improved" data-md-value="-1">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 15V3h4v12zM15 3a2 2 0 0 1 2 2v10c0 .55-.22 1.05-.59 1.41L9.83 23l-1.06-1.06c-.27-.27-.44-.64-.44-1.06l.03-.31.95-4.57H3a2 2 0 0 1-2-2v-2c0-.26.05-.5.14-.73l3.02-7.05C4.46 3.5 5.17 3 6 3zm0 2H5.97L3 12v2h8.78l-1.13 5.32L15 14.97z"/></svg>
+            </button>
+          
+        </div>
+        <div class="md-feedback__note">
+          
+            <div data-md-value="1" hidden>
+              
+              
+                
+              
+              
+              
+                
+                
+              
+              Thanks for your feedback!
+            </div>
+          
+            <div data-md-value="-1" hidden>
+              
+              
+                
+              
+              
+              
+                
+                
+              
+              Thanks for your feedback! Help us improve this page by using our <a href="..." target="_blank" rel="noopener">feedback form</a>.  
+            </div>
+          
+        </div>
+      </div>
+    </fieldset>
+  </form>
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2023 University of Colorado Boulder
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/cu-esiil/" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "navigation.instant", "navigation.tracking", "navigation.indexes", "navigation.top", "toc.integrate", "toc.follow", "content.code.copy"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+    
+  </body>
+</html>
