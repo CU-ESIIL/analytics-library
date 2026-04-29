@@ -1,0 +1,52 @@
+:root {
+  --esiil-primary-blue: #234A65;
+  --esiil-accent-blue: #42BCDC;
+  --esiil-accent-green: #007135;
+  --esiil-body-text: #161A19;
+  --esiil-gray-relief: #E3E3E3;
+}
+
+.md-header,
+.md-tabs {
+  background: var(--esiil-primary-blue);
+}
+
+.md-typeset {
+  color: var(--esiil-body-text);
+}
+
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3 {
+  color: var(--esiil-primary-blue);
+  letter-spacing: 0;
+}
+
+.md-typeset a {
+  color: var(--esiil-accent-green);
+}
+
+.md-typeset .md-button {
+  border-radius: 0;
+  border: 0;
+  color: #fff;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--esiil-accent-blue), var(--esiil-accent-green));
+}
+
+.md-typeset .grid.cards > ul > li,
+.md-typeset .md-typeset__table,
+.md-typeset details {
+  border-radius: 0;
+  box-shadow: none;
+  border-color: var(--esiil-gray-relief);
+}
+
+.md-typeset code,
+.md-typeset pre {
+  border-radius: 0;
+}
+
+.md-typeset img {
+  border-radius: 0;
+}
