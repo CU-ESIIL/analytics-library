@@ -9,11 +9,25 @@ copyright: Copyright &copy; 2023 University of Colorado Boulder
 nav:
 - Innovation Summit 2025: innovation-summit-2025.md
 - Home: index.md
+- How to Use: how-to-use.md
 - Topics:
   - forecasting: topic/forecasting.md
+  - remote-sensing: topic/remote-sensing.md
   - time-series: topic/time-series.md
+  - python-example: topic/python-example.md
+  - r-example: topic/r-example.md
+  - reproducible: topic/reproducible.md
+  - raster: topic/raster.md
+  - tipping-points: topic/tipping-points.md
+- Analyses:
+  - PRISM Tipping Point Forecast: time_series/prism_tipping_point_forecast/index.md
+  - Sentinel-2 Cloud Correction: remote_sensing/sentinel2_cloud_correction/index.md
+  - Post-Fire Random Forest: remote_sensing/post_fire_tipping_points_random_forest/index.md
 - Tags: tags.md
-- How to Contribute: https://cu-esiil.github.io/how_to_contribute/
+- Style Guide: style-guide.md
+- Site Health: site-health.md
+- Prompt Log: prompt-log.md
+- How to Contribute: how-to-contribute.md
 theme:
   highlightjs: true
   name: material

@@ -11,11 +11,113 @@ tags:
   - tipping-points
   - machine-learning
   - innovation-summit-2025
+  - classification
+  - random-forest
+  - raster
+  - python-example
+  - r-example
+  - reproducible
 ---
 
 # Burning Boundaries: Random Forest Early Warnings for Post-Fire Collapse
 
 ![Random Forest NDVI Fire](images/random_forest_nvdi_fire.png)
+
+## What this analysis does
+
+This workflow turns pre/post-fire vegetation time series into early-warning features, trains a lightweight classifier, and produces feature-importance or risk summaries. The compact examples below use small tabular data so the function pattern is runnable before adapting it to Sentinel-2 and FIRED data.
+
+Use this analysis with these datasets:
+
+- [ESIIL Data Library](https://cu-esiil.github.io/data-library/) fire, Sentinel-2, and vegetation-index entries.
+- Fire event tables joined to time series or raster-derived NDVI summaries.
+
+## When to use it
+
+Use this when you have observations labeled as recovered or collapsed and want a transparent first-pass classification workflow.
+
+## Inputs
+
+- `data`: a table with predictor columns and a binary outcome column.
+- `outcome`: the binary response, such as `collapse`.
+- `features`: numeric columns such as trend, variance, autocorrelation, or pre/post differences.
+
+## R example
+
+```r
+post_fire_classifier <- function(data, outcome = "collapse",
+                                 features = c("slope", "variance", "post_drop")) {
+  formula <- as.formula(paste(outcome, "~", paste(features, collapse = " + ")))
+  model <- glm(formula, data = data, family = binomial())
+  probability <- predict(model, type = "response")
+  plot(data$post_drop, probability, pch = 19, col = "#234A65",
+       xlab = "Post-fire NDVI drop", ylab = "Predicted collapse probability",
+       main = "Post-fire collapse screen")
+  list(model = model, probability = probability, summary = summary(model))
+}
+
+example <- data.frame(
+  slope = c(-0.04, -0.02, 0.01, -0.08, 0.03, -0.06, 0.02, -0.05),
+  variance = c(0.12, 0.08, 0.03, 0.18, 0.04, 0.16, 0.05, 0.14),
+  post_drop = c(0.35, 0.22, 0.05, 0.48, 0.02, 0.41, 0.08, 0.37),
+  collapse = c(1, 1, 0, 1, 0, 1, 0, 1)
+)
+
+result <- post_fire_classifier(example)
+print(result$summary)
+```
+
+## Python example
+
+```python
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.ensemble import RandomForestClassifier
+
+
+def post_fire_classifier(data, outcome="collapse",
+                         features=("slope", "variance", "post_drop")):
+    """Train a small classifier and return model, probabilities, and importances."""
+    X = data.loc[:, list(features)]
+    y = data[outcome]
+    model = RandomForestClassifier(n_estimators=100, random_state=42, max_depth=3)
+    model.fit(X, y)
+    probability = model.predict_proba(X)[:, 1]
+    importances = pd.Series(model.feature_importances_, index=features).sort_values()
+
+    importances.plot(kind="barh", color="#007135", title="Feature importances")
+    plt.xlabel("Importance")
+    plt.tight_layout()
+    plt.show()
+    return {"model": model, "probability": probability, "importances": importances}
+
+
+example = pd.DataFrame({
+    "slope": [-0.04, -0.02, 0.01, -0.08, 0.03, -0.06, 0.02, -0.05],
+    "variance": [0.12, 0.08, 0.03, 0.18, 0.04, 0.16, 0.05, 0.14],
+    "post_drop": [0.35, 0.22, 0.05, 0.48, 0.02, 0.41, 0.08, 0.37],
+    "collapse": [1, 1, 0, 1, 0, 1, 0, 1],
+})
+
+result = post_fire_classifier(example)
+print(result["importances"])
+```
+
+## Minimum viable output
+
+The compact R example returns a fitted logistic model and predicted probabilities. The compact Python example returns a fitted random forest, predicted probabilities, and a feature-importance plot.
+
+## Interpretation
+
+High predicted probability means the training pattern resembles pixels or sites labeled as post-fire collapse. It should be interpreted as a screening signal that needs validation with independent fires, field data, or longer recovery windows.
+
+## Limitations
+
+The compact examples use tiny tabular data and are not suitable for scientific inference by themselves. The extended workflow below explains how to build raster features, group cross-validation by fire, and map probabilities.
+
+## Tags
+
+remote-sensing, sentinel-2, fire, classification, random-forest, machine-learning, raster, time-series, NDVI, R example, Python example, reproducible
 
 ## Introduction
 
@@ -932,4 +1034,3 @@ def produce_figures(
 # )
 # display(fig_facets)
 ```
-

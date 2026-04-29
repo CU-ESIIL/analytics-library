@@ -9,11 +9,130 @@ tags:
   - tipping-points
   - climate
   - innovation-summit-2025
+  - regression
+  - trend-analysis
+  - python-example
+  - r-example
+  - reproducible
 ---
 
 # Finding Breaks and Forecasting Climate data using PRISM
 
 ![PRISM forecast with detected breakpoint](images/forecast_and_breakpoint.png)
+
+## What this analysis does
+
+This workflow detects a possible break in a climate time series and extends the series with a simple forecast. The compact examples below use small built-in data so users can test the analytic pattern before connecting it to PRISM or another Data Library climate source.
+
+Use this analysis with these datasets:
+
+- [PRISM and climate entries in the ESIIL Data Library](https://cu-esiil.github.io/data-library/).
+- Any monthly or annual climate time series with a date column and numeric value column.
+
+## When to use it
+
+Use this when you need a quick screen for trend changes, possible tipping behavior, or a transparent baseline forecast.
+
+## Inputs
+
+- `data`: a table with a time column and a numeric value column.
+- `time_col`: date or ordered time column.
+- `value_col`: climate value such as temperature, precipitation, or index value.
+- `horizon`: number of future steps to forecast.
+
+## R example
+
+```r
+forecast_break_summary <- function(data, time_col = "date", value_col = "value", horizon = 6) {
+  y <- data[[value_col]]
+  t <- seq_along(y)
+  candidate_breaks <- 4:(length(y) - 4)
+  rss <- sapply(candidate_breaks, function(k) {
+    left <- lm(y[1:k] ~ t[1:k])
+    right <- lm(y[(k + 1):length(y)] ~ t[(k + 1):length(y)])
+    sum(residuals(left)^2) + sum(residuals(right)^2)
+  })
+  break_index <- candidate_breaks[which.min(rss)]
+  model <- lm(y ~ t)
+  future_t <- (length(y) + 1):(length(y) + horizon)
+  forecast <- predict(model, newdata = data.frame(t = future_t))
+  plot(t, y, type = "l", xlab = "Time step", ylab = value_col,
+       main = "Break screen with linear forecast")
+  abline(v = break_index, col = "#007135", lty = 2)
+  lines(future_t, forecast, col = "#42BCDC", lwd = 2)
+  list(break_index = break_index, model = model, forecast = forecast)
+}
+
+example <- data.frame(
+  date = seq.Date(as.Date("2010-01-01"), by = "month", length.out = 24),
+  value = c(1.0, 1.1, 1.1, 1.2, 1.3, 1.3, 1.4, 1.5, 1.7, 1.9, 2.0, 2.2,
+            2.7, 2.9, 3.2, 3.3, 3.6, 3.8, 4.0, 4.1, 4.3, 4.5, 4.8, 5.0)
+)
+
+result <- forecast_break_summary(example)
+print(result$break_index)
+```
+
+## Python example
+
+```python
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+def forecast_break_summary(data, time_col="date", value_col="value", horizon=6):
+    """Detect one simple break candidate and return a linear forecast summary."""
+    y = np.asarray(data[value_col], dtype=float)
+    t = np.arange(len(y))
+    candidates = range(4, len(y) - 4)
+    scores = []
+    for k in candidates:
+        left = np.polyfit(t[:k], y[:k], 1)
+        right = np.polyfit(t[k:], y[k:], 1)
+        left_rss = np.sum((y[:k] - np.polyval(left, t[:k])) ** 2)
+        right_rss = np.sum((y[k:] - np.polyval(right, t[k:])) ** 2)
+        scores.append(left_rss + right_rss)
+    break_index = list(candidates)[int(np.argmin(scores))]
+    trend = np.polyfit(t, y, 1)
+    future_t = np.arange(len(y), len(y) + horizon)
+    forecast = np.polyval(trend, future_t)
+
+    plt.plot(t, y, label="observed")
+    plt.axvline(break_index, color="#007135", linestyle="--", label="break screen")
+    plt.plot(future_t, forecast, color="#42BCDC", label="forecast")
+    plt.xlabel("Time step")
+    plt.ylabel(value_col)
+    plt.legend()
+    plt.show()
+    return {"break_index": break_index, "trend": trend, "forecast": forecast}
+
+
+example = pd.DataFrame({
+    "date": pd.date_range("2010-01-01", periods=24, freq="MS"),
+    "value": [1.0, 1.1, 1.1, 1.2, 1.3, 1.3, 1.4, 1.5, 1.7, 1.9, 2.0, 2.2,
+              2.7, 2.9, 3.2, 3.3, 3.6, 3.8, 4.0, 4.1, 4.3, 4.5, 4.8, 5.0],
+})
+
+result = forecast_break_summary(example)
+print(result["break_index"])
+```
+
+## Minimum viable output
+
+The compact function returns the screened break index, fitted trend, and forecast values. It also plots observed values, a candidate break line, and a short forecast.
+
+## Interpretation
+
+Treat the break as a screening result, not proof of a tipping point. Follow up with domain knowledge, diagnostics, and sensitivity checks across time windows and model choices.
+
+## Limitations
+
+The compact example uses a simple linear baseline. The extended PRISM workflow below includes stronger climate-specific data access, model comparison, and uncertainty intervals, but it requires more dependencies and runtime.
+
+## Tags
+
+time-series, forecasting, regression, trend-analysis, climate, tipping-points, PRISM, R example, Python example, reproducible
 
 ## Introduction
 Climate systems are often assumed to change gradually, but in many cases they exhibit **abrupt shifts** or **“tipping points”** where the rate of change accelerates or decelerates. Detecting and forecasting such breaks in climate time series is important for understanding regional climate impacts, anticipating ecosystem stress, and informing adaptation planning. This workflow combines data streaming, change-point detection, and time-series forecasting to provide a reproducible way of investigating potential tipping points in observed climate records.

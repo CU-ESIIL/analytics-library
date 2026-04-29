@@ -1,13 +1,55 @@
 # Analytics Library Style Guide
 
-This document outlines conventions for adding new analyses to the library.
+This guide aligns Analytics Library pages with the ESIIL/OASIS visual system while keeping the site focused on analysis.
 
-## File naming
-- Place each analysis under an appropriate subdirectory in `docs/`.
-- Use short, descriptive, lowercase file names separated by hyphens (e.g. `my-analysis.md`).
+## Color Tokens
 
-## Front matter
-Start every file with YAML front matter providing metadata used by the site:
+Use these shared tokens in CSS and visual assets:
+
+```css
+--esiil-primary-blue: #234A65;
+--esiil-accent-blue: #42BCDC;
+--esiil-accent-green: #007135;
+--esiil-body-text: #161A19;
+--esiil-gray-relief: #E3E3E3;
+```
+
+## Visual Rules
+
+- Use square tiles for browsable topics, analysis cards, and repeated items.
+- Keep layouts flat, direct, and screen-print inspired.
+- Do not use 3D effects, perspective, glassmorphism, or heavy shadows.
+- Use consistent spacing between sections, code blocks, and cards.
+- Use strong contrast and restrained color.
+- Keep diagrams and plots legible in both light and dark mode.
+
+## Buttons and Links
+
+- Buttons should be rectangular.
+- Button text should be bold.
+- Use a blue-to-green gradient where a primary action needs emphasis.
+- Use plain text links for supporting references and citations.
+
+## Analytic Page Structure
+
+Every analytic entry should include:
+
+```markdown
+# Analysis Name
+## What this analysis does
+## When to use it
+## Inputs
+## R example
+## Python example
+## Minimum viable output
+## Interpretation
+## Limitations
+## Tags
+```
+
+## Front Matter
+
+Start each analytic with YAML front matter:
 
 ```yaml
 ---
@@ -16,23 +58,37 @@ authors:
   - Your Name
 date: YYYY-MM-DD
 tags:
-  - topic
-  - method
+  - method-tag
+  - data-type-tag
+  - domain-tag
+  - R example
+  - Python example
 ---
 ```
 
-## Required sections
-Organize each entry with the following sections:
+## Code Style
 
-1. **Description** – Explain the analysis, why it is valuable, the type of data it accepts, and suggest sources from the data library.
-2. **Usage Example** – Include a self-contained, copy‑and‑pasteable code snippet that loads a dataset from the data library, performs the analysis, and produces a plot demonstrating the results.
-3. **Interpretation and Heuristics** – Provide context for reading the results and guidance on common pitfalls or rules of thumb.
+- Include both R and Python.
+- Define a function in each language.
+- Use small example data directly in the page when possible.
+- Produce a visible plot, map, or summary.
+- Return a useful object from the function.
+- Avoid secrets, API keys, hidden local paths, and manual setup.
 
-## Writing tips
-- Use `#` for the document title and `##` for section headings.
-- Prefer concise sentences and active voice.
-- Include links to relevant data library entries and external resources when helpful.
-- Provide meaningful alt text for all images and plots.
-- Keep code blocks executable as written; import all required libraries in the snippet.
+## Tagging
 
-Adhering to these guidelines ensures consistent, discoverable, and easy-to-understand analytics examples.
+Use tags that help people search the way they think:
+
+- Method: `regression`, `clustering`, `classification`, `forecasting`, `spatial-statistics`.
+- Data type: `raster`, `tabular`, `time-series`, `vector`, `remote-sensing`.
+- Domain: `climate`, `ecology`, `fire`, `water`, `biodiversity`.
+- Workflow: `R example`, `Python example`, `beginner`, `reproducible`.
+- Synonyms: add alternate terms such as `prediction`, `segmentation`, `change-detection`, or `trend-analysis` when useful.
+
+## Writing Style
+
+- Lead with what the analysis does and when to use it.
+- Keep prose concise and practical.
+- Link to Data Library entries instead of repeating their dataset documentation.
+- Put limitations close to interpretation so users understand uncertainty.
+- Prefer simple, reusable functions over clever one-off scripts.

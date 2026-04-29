@@ -1,0 +1,9 @@
+.DS_Store
+site/
+.venv/
+node_modules/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+test-results/
+playwright-report/

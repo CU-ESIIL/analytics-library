@@ -7,9 +7,114 @@ tags:
   - remote-sensing
   - sentinel-2
   - cloud-correction
+  - raster
+  - python-example
+  - r-example
+  - beginner
+  - reproducible
+  - compositing
 ---
 
 # Creating Cloud Corrected Sentinel-2 Images
+
+## What this analysis does
+
+This workflow masks cloudy raster cells and builds a cloud-reduced composite from multiple images. The compact examples below use small matrices so the method is copy-paste runnable; the extended Sentinel-2 version later in the page applies the same idea to real scenes.
+
+Use this analysis with these datasets:
+
+- [ESIIL Data Library](https://cu-esiil.github.io/data-library/) remote-sensing entries.
+- Sentinel-2 imagery accessed from public catalogs or downloaded with a Data Library workflow.
+
+## When to use it
+
+Use this when you have repeated remote-sensing observations for the same area and want a minimum viable cloud-masked median composite.
+
+## Inputs
+
+- `data`: a stack/list of same-sized raster layers or matrices.
+- `cloud_masks`: matching masks where `1` means clear and `0` means cloudy.
+- `max_value`: optional upper threshold for invalid bright/cloud-contaminated pixels.
+
+## R example
+
+```r
+cloud_clean_composite <- function(data, cloud_masks, max_value = Inf) {
+  stopifnot(length(data) == length(cloud_masks))
+  cleaned <- Map(function(img, mask) {
+    img <- as.matrix(img)
+    mask <- as.matrix(mask)
+    img[mask == 0 | img > max_value] <- NA_real_
+    img
+  }, data, cloud_masks)
+
+  cube <- array(unlist(cleaned), dim = c(dim(cleaned[[1]]), length(cleaned)))
+  composite <- apply(cube, c(1, 2), median, na.rm = TRUE)
+  image(t(apply(composite, 2, rev)), col = gray.colors(20), axes = FALSE,
+        main = "Cloud-cleaned composite")
+  composite
+}
+
+img1 <- matrix(c(10, 12, 99, 14, 15, 16, 17, 18, 19), nrow = 3)
+img2 <- matrix(c(11, 13, 14, 50, 16, 17, 18, 19, 20), nrow = 3)
+mask1 <- matrix(c(1, 1, 0, 1, 1, 1, 1, 1, 1), nrow = 3)
+mask2 <- matrix(c(1, 1, 1, 0, 1, 1, 1, 1, 1), nrow = 3)
+
+result <- cloud_clean_composite(list(img1, img2), list(mask1, mask2), max_value = 80)
+print(result)
+```
+
+## Python example
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+def cloud_clean_composite(data, cloud_masks, max_value=np.inf):
+    """Mask cloudy cells and return a median composite."""
+    stack = []
+    for image, mask in zip(data, cloud_masks):
+        arr = np.asarray(image, dtype=float).copy()
+        clear = np.asarray(mask) == 1
+        arr[(~clear) | (arr > max_value)] = np.nan
+        stack.append(arr)
+
+    composite = np.nanmedian(np.stack(stack), axis=0)
+    plt.imshow(composite, cmap="gray")
+    plt.title("Cloud-cleaned composite")
+    plt.axis("off")
+    plt.show()
+    return composite
+
+
+img1 = np.array([[10, 12, 99], [14, 15, 16], [17, 18, 19]])
+img2 = np.array([[11, 13, 14], [50, 16, 17], [18, 19, 20]])
+mask1 = np.array([[1, 1, 0], [1, 1, 1], [1, 1, 1]])
+mask2 = np.array([[1, 1, 1], [0, 1, 1], [1, 1, 1]])
+
+result = cloud_clean_composite([img1, img2], [mask1, mask2], max_value=80)
+print(result)
+```
+
+## Minimum viable output
+
+The function returns a composite matrix/array and displays a small grayscale raster plot.
+
+## Interpretation
+
+Cells with valid clear observations retain the median value across dates. Cells that are cloudy in all observations remain missing and require more dates or a different compositing window.
+
+## Limitations
+
+The compact examples do not perform geospatial reprojection, band alignment, or quality-mask parsing. For real Sentinel-2 workflows, verify that all input bands share the same grid, projection, and pixel size.
+
+## Tags
+
+remote-sensing, sentinel-2, cloud-correction, raster, compositing, R example, Python example, beginner, reproducible
+
+## Extended Sentinel-2 workflow
+
 Erick Verleye, ESIIL Software Developer
 
 A common issue when working with remote imaging data is that for a single image,
@@ -261,7 +366,7 @@ tutorial for mgrs 36NUG and band B02. A figure of the file structure is included
 above. Make sure to change the in_dir and out_file parameters to match your environment.
 
 ``` {python}
-create_cloud_cleaned_composite(in_dir=<your_in_dir>, mgrs_tile='36NUG', band='B02', out_file='test.tif')
+create_cloud_cleaned_composite(in_dir='sentinel2_example', mgrs_tile='36NUG', band='B02', out_file='test.tif')
 ```
 
 This should create an output file called test.tif in your working directory that is cloud cleaned.
@@ -282,7 +387,6 @@ We can see that all of the areas that used to be clouds are now NaN, or white in
 to get a full image with no NaNs may require months worth of data. It is achievable with this code, but too much for this tutuorial.
 Over several months there will be days where the areas now in white are not covered by clouds, and thus the median of those days' pixels
 will begin to fill in the white spots until you have a full image. 
-
 
 
 
