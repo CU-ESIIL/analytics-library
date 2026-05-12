@@ -36,8 +36,10 @@ DOC_PAGES = {
     "style-guide.md",
     "prompt-log.md",
     "tags.md",
-    "innovation-summit-2025.md",
     "how-to-contribute.md",
+}
+LEGACY_TUTORIALS = {
+    "remote_sensing/sentinel2_cloud_correction/index.md",
 }
 
 SECRET_PATTERNS = [
@@ -88,7 +90,7 @@ def parse_simple_front_matter(raw: str) -> dict:
 
 def is_analysis_page(path: Path) -> bool:
     rel = path.relative_to(DOCS).as_posix()
-    if rel in DOC_PAGES or rel.startswith("topic/"):
+    if rel in DOC_PAGES or rel in LEGACY_TUTORIALS or rel.startswith("topic/"):
         return False
     return path.name == "index.md" and len(path.relative_to(DOCS).parts) >= 2
 

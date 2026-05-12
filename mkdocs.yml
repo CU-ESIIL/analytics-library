@@ -6,27 +6,18 @@ repo_name: analytics-library
 repo_url: https://github.com/cu-esiil/analytics-library
 edit_uri: edit/main/docs/
 copyright: Copyright &copy; 2023 University of Colorado Boulder
+not_in_nav: |
+  how-to-use.md
+  tags.md
+  style-guide.md
+  site-health.md
+  prompt-log.md
+  topic/*.md
+  remote_sensing/sentinel2_cloud_correction/index.md
 nav:
-- Innovation Summit 2025: innovation-summit-2025.md
 - Home: index.md
-- How to Use: how-to-use.md
-- Topics:
-  - forecasting: topic/forecasting.md
-  - remote-sensing: topic/remote-sensing.md
-  - time-series: topic/time-series.md
-  - python-example: topic/python-example.md
-  - r-example: topic/r-example.md
-  - reproducible: topic/reproducible.md
-  - raster: topic/raster.md
-  - tipping-points: topic/tipping-points.md
-- Analyses:
-  - PRISM Tipping Point Forecast: time_series/prism_tipping_point_forecast/index.md
-  - Sentinel-2 Cloud Correction: remote_sensing/sentinel2_cloud_correction/index.md
-  - Post-Fire Random Forest: remote_sensing/post_fire_tipping_points_random_forest/index.md
-- Tags: tags.md
-- Style Guide: style-guide.md
-- Site Health: site-health.md
-- Prompt Log: prompt-log.md
+- PRISM Tipping Point Forecast: time_series/prism_tipping_point_forecast/index.md
+- Post-Fire Random Forest: remote_sensing/post_fire_tipping_points_random_forest/index.md
 - How to Contribute: how-to-contribute.md
 theme:
   highlightjs: true
@@ -76,7 +67,8 @@ extra:
         name: This page could be improved
         data: -1
         note: 'Thanks for your feedback! Help us improve this page by using our <a
-          href="..." target="_blank" rel="noopener">feedback form</a>.  '
+          href="https://github.com/cu-esiil/analytics-library/issues" target="_blank"
+          rel="noopener">feedback form</a>.  '
 extra_css:
 - stylesheets/extra.css
 plugins:

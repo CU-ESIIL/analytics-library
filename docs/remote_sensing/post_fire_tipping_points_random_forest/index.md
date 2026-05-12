@@ -10,7 +10,6 @@ tags:
   - fire
   - tipping-points
   - machine-learning
-  - innovation-summit-2025
   - classification
   - random-forest
   - raster

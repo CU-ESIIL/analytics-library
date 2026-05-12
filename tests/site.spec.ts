@@ -54,7 +54,12 @@ test('navigation works', async ({ page }) => {
 });
 
 test('no obvious 404 text on key pages', async ({ page }) => {
-  const paths = ['/', '/how-to-use/', '/tags/'];
+  const paths = [
+    '/',
+    '/time_series/prism_tipping_point_forecast/',
+    '/remote_sensing/post_fire_tipping_points_random_forest/',
+    '/how-to-contribute/'
+  ];
 
   for (const path of paths) {
     await page.goto(path);

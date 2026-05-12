@@ -8,7 +8,6 @@ tags:
   - forecasting
   - tipping-points
   - climate
-  - innovation-summit-2025
   - regression
   - trend-analysis
   - python-example
